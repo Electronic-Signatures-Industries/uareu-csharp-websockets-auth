@@ -1,4 +1,5 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Services;
 using Nancy;
 using System;
 using System.Collections.Generic;
@@ -19,28 +20,8 @@ namespace DSS.UareU.Web.Api.Service.Controllers
 
             Get["/info", true] = async (parameters, ct) =>
             {
-                var readers = ReaderCollection.GetReaders();
-                var tcs = new TaskCompletionSource<Reader.ReaderDescription>();
-
-                if (readers.Count > 0)
-                {
-                    var reader = readers.FirstOrDefault();
-                        if (reader.Open(Constants.CapturePriority.DP_PRIORITY_COOPERATIVE) == Constants.ResultCode.DP_SUCCESS)
-                        {
-                            tcs.SetResult(reader.Description);
-                        } else
-                        {
-                        tcs.SetResult(null);
-                        }
-                        reader.Dispose();
-
-                } else
-                {
-                    tcs.SetCanceled();
-                }
-
-                return await tcs.Task;
-
+                DPUareUReaderService service = new DPUareUReaderService();
+                return await service.GetReaderInfo();
             };
 
         }
