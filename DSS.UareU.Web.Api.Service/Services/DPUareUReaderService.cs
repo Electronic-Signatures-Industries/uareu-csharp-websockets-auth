@@ -15,49 +15,61 @@ namespace DSS.UareU.Web.Api.Service.Services
         {
             var readers = ReaderCollection.GetReaders();
             var tcs = new TaskCompletionSource<dynamic>();
+            System.Timers.Timer t = new System.Timers.Timer();
 
             if (readers.Count > 0)
             {
-                if (_reader != null)
+                if (_reader == null)
                 {
-                    _reader.CancelCapture();
-                    _reader.Dispose();
+                    _reader = readers.FirstOrDefault();
                 }
-                _reader = null;
-                _reader = readers.FirstOrDefault();
-                //Console.WriteLine(_reader.Status.Status);
                 var opened = _reader.Open(Constants.CapturePriority.DP_PRIORITY_COOPERATIVE);
-                Console.WriteLine(opened);
-                //Thread.Sleep(1000);
+                Thread.Sleep(550);
+                Console.WriteLine("Opened: " + opened.ToString());
+
                 if (opened == Constants.ResultCode.DP_SUCCESS)
                 {
-                    //_reader.CancelCapture();
-                    var flag = _reader.CaptureAsync(Constants.Formats.Fid.ANSI, Constants.CaptureProcessing.DP_IMG_PROC_DEFAULT, 500);
+                    var flag = _reader.CaptureAsync(Constants.Formats.Fid.ANSI, 
+                        Constants.CaptureProcessing.DP_IMG_PROC_DEFAULT, 500);
+                    Thread.Sleep(1500);
                     _reader.On_Captured += (res) =>
                     {
-                        Console.WriteLine(res.ResultCode);
+                        Console.WriteLine("Captured");
                         var item = new {
-                            Data = System.Convert.ToBase64String(res.Data.Bytes),
+                            Data = System.Convert.ToBase64String(res.Data.Views[0].RawImage),
+                            res.Data.Views[0].Width,
+                            res.Data.Views[0].Height,
                             res.Data.FingerCount,
                             res.Data.Format,
                             res.Data.ImageResolution,
                         };
                         _reader.CancelCapture();
+                        Thread.Sleep(1500);
                         _reader.Dispose();
                         tcs.SetResult(item);
                     };
                 }
                 else
                 {
-                    tcs.SetResult(null);
+                    tcs.SetResult(new { Message = opened.ToString() });
                 }
-            //    reader.Dispose();
             } else
             {
-                tcs.SetCanceled();
+                tcs.SetException(new Exception("No reader"));
             }
 
+            //t.Interval = 10000;
+            //t.Elapsed += (sender, e) => {
+            //    tcs.SetException(new Exception("10 s timeout"));
+            //    t.Stop();
+            //};
+            //t.Start();
             return tcs.Task;
+        }
+
+        private void T_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void Reader_On_Captured(CaptureResult result)
