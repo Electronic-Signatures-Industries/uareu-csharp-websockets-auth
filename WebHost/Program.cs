@@ -22,3 +22,5 @@ namespace WebHost
         }
     }
 }
+
+// SSLProxy.RewriteSchemeUsingForwardedHeaders(pipelines)
