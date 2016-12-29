@@ -11,11 +11,43 @@ namespace DSS.UareU.Web.Api.Service.Services
     public class DPUareUReaderService
     {
         Reader _reader;
-        public Task<dynamic> Capture()
+        
+        public Task<dynamic> VerifyAsync() 
         {
             var readers = ReaderCollection.GetReaders();
             var tcs = new TaskCompletionSource<dynamic>();
-            System.Timers.Timer t = new System.Timers.Timer();
+
+            if (readers.Count > 0)
+            {
+                var reader = readers.FirstOrDefault();
+                var opened = reader.Open(Constants.CapturePriority.DP_PRIORITY_COOPERATIVE);
+                Thread.Sleep(550);
+                Console.WriteLine("Opened: " + opened.ToString());
+
+                if (opened == Constants.ResultCode.DP_SUCCESS)
+                {
+                    Thread.Sleep(1500);
+                    tcs.SetResult(new {});
+                }
+                else
+                {
+                    tcs.SetResult(new { Message = opened.ToString() });
+                }
+            
+                reader.Dispose();
+
+            } else
+            {
+                tcs.SetException(new Exception("No reader"));
+            }
+            
+            return tcs.Task;
+        }
+
+        public Task<dynamic> CaptureAsync()
+        {
+            var readers = ReaderCollection.GetReaders();
+            var tcs = new TaskCompletionSource<dynamic>();
 
             if (readers.Count > 0)
             {
@@ -58,23 +90,7 @@ namespace DSS.UareU.Web.Api.Service.Services
                 tcs.SetException(new Exception("No reader"));
             }
 
-            //t.Interval = 10000;
-            //t.Elapsed += (sender, e) => {
-            //    tcs.SetException(new Exception("10 s timeout"));
-            //    t.Stop();
-            //};
-            //t.Start();
             return tcs.Task;
-        }
-
-        private void T_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void Reader_On_Captured(CaptureResult result)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<Reader.ReaderDescription> GetReaderInfo()

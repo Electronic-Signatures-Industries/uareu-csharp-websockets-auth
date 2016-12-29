@@ -18,7 +18,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers
                 return "OK";
             };
 
-            Get["/info", true] = async (parameters, ct) =>
+            Get["/v1/device_info", true] = async (parameters, ct) =>
             {
                 DPUareUReaderService service = new DPUareUReaderService();
                 return await service.GetReaderInfo();
