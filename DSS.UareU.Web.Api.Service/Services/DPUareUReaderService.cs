@@ -20,7 +20,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             if (readers.Count > 0)
             {
                 var reader = readers.FirstOrDefault();
-                var opened = reader.Open(Constants.CapturePriority.DP_PRIORITY_COOPERATIVE);
+                var opened = reader.Open(Constants.CapturePriority.DP_PRIORITY_EXCLUSIVE);
                 Thread.Sleep(550);
                 Console.WriteLine("Opened: " + opened.ToString());
 
@@ -55,7 +55,7 @@ namespace DSS.UareU.Web.Api.Service.Services
                 {
                     _reader = readers.FirstOrDefault();
                 }
-                var opened = _reader.Open(Constants.CapturePriority.DP_PRIORITY_COOPERATIVE);
+                var opened = _reader.Open(Constants.CapturePriority.DP_PRIORITY_EXCLUSIVE);
                 Thread.Sleep(550);
                 Console.WriteLine("Opened: " + opened.ToString());
 
