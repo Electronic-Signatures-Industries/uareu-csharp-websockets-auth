@@ -1,6 +1,8 @@
 ﻿using DPUruNet;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,6 +14,14 @@ namespace DSS.UareU.Web.Api.Service.Services
     {
         Reader _reader;
         
+        public void Close()
+        {
+            if (this._reader != null)
+            {
+                this._reader.Dispose();
+            }
+        }
+
         public Task<dynamic> VerifyAsync() 
         {
             var readers = ReaderCollection.GetReaders();
@@ -44,6 +54,12 @@ namespace DSS.UareU.Web.Api.Service.Services
             return tcs.Task;
         }
 
+        private Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code)
+        {
+            return new Nancy.Response{
+                StatusCode = code };
+        }
+
         public Task<dynamic> CaptureAsync()
         {
             var readers = ReaderCollection.GetReaders();
@@ -67,14 +83,15 @@ namespace DSS.UareU.Web.Api.Service.Services
                     _reader.On_Captured += (res) =>
                     {
                         Console.WriteLine("Captured");
-                        var item = new {
-                            Data = System.Convert.ToBase64String(res.Data.Views[0].RawImage),
-                            res.Data.Views[0].Width,
-                            res.Data.Views[0].Height,
-                            res.Data.FingerCount,
-                            res.Data.Format,
-                            res.Data.ImageResolution,
-                        };
+                        var view = res.Data.Views.FirstOrDefault();
+                        if (view != null) {
+                            var id = Guid.NewGuid().ToString();
+                            var img = CreateBitmap(view.RawImage, view.Width, view.Height);
+                            img.Save(id + ".jpg");
+                            // save as guid.jpg
+                            // send as Location, 201
+                            // send nancy resp
+                        }
                         _reader.CancelCapture();
                         Thread.Sleep(1500);
                         _reader.Dispose();
@@ -120,5 +137,31 @@ namespace DSS.UareU.Web.Api.Service.Services
             return tcs.Task;
 
         }
+
+        public Bitmap CreateBitmap(byte[] bytes, int width, int height)
+        {
+            byte[] rgbBytes = new byte[bytes.Length * 3];
+
+            for (int i = 0; i <= bytes.Length - 1; i++)
+            {
+                rgbBytes[(i * 3)] = bytes[i];
+                rgbBytes[(i * 3) + 1] = bytes[i];
+                rgbBytes[(i * 3) + 2] = bytes[i];
+            }
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+
+            for (int i = 0; i <= bmp.Height - 1; i++)
+            {
+                IntPtr p = new IntPtr(data.Scan0.ToInt64() + data.Stride * i);
+                System.Runtime.InteropServices.Marshal.Copy(rgbBytes, i * bmp.Width * 3, p, bmp.Width * 3);
+            }
+
+            bmp.UnlockBits(data);
+
+            return bmp;
+        }
+
     }
 }

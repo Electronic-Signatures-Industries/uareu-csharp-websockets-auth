@@ -17,7 +17,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
         public CaptureModule() : base("/api/v1/capture")
         {
-            Get["/", true] = async (parameters, ct) =>
+            Post["/", true] = async (parameters, ct) =>
             {                
                 JsonSettings.MaxJsonLength = 50 * 10000;
                 var captureTask = service.CaptureAsync();
@@ -25,6 +25,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                 if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000))) {
                     return await captureTask;
                 } else {
+                    service.Close();
                     return Task.FromResult(new { Message = "Timeout after 15 seconds" });
                 }
             };
