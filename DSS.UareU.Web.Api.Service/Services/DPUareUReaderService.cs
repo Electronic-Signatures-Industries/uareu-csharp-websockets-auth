@@ -54,16 +54,22 @@ namespace DSS.UareU.Web.Api.Service.Services
             return tcs.Task;
         }
 
-        private Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code)
+        private Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code, string uri)
         {
             return new Nancy.Response{
                 StatusCode = code };
         }
 
-        public Task<dynamic> CaptureAsync()
+        private Nancy.Response BuildMessageResponse(string message)
+        {
+            return new Nancy.Response{
+                StatusCode = code };
+        }
+
+        public Task<Nancy.Response> CaptureAsync()
         {
             var readers = ReaderCollection.GetReaders();
-            var tcs = new TaskCompletionSource<dynamic>();
+            var tcs = new TaskCompletionSource<Nancy.Response>();
 
             if (readers.Count > 0)
             {
@@ -90,21 +96,23 @@ namespace DSS.UareU.Web.Api.Service.Services
                             img.Save(id + ".jpg");
                             // save as guid.jpg
                             // send as Location, 201
+                            var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);
                             // send nancy resp
+                            tcs.SetResult(resp);
                         }
                         _reader.CancelCapture();
                         Thread.Sleep(1500);
                         _reader.Dispose();
-                        tcs.SetResult(item);
+                        tcs.SetResult(BuildMessageResponse("No image captured"));
                     };
                 }
                 else
                 {
-                    tcs.SetResult(new { Message = opened.ToString() });
+                    tcs.SetResult(BuildMessageResponse(opened.ToString()));
                 }
             } else
             {
-                tcs.SetException(new Exception("No reader"));
+                tcs.SetResult(BuildMessageResponse("No reader"))
             }
 
             return tcs.Task;
