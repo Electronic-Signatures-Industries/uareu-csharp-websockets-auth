@@ -19,7 +19,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             Post["/verify", true] = async (parameters, ct) =>
             {                
                 JsonSettings.MaxJsonLength = 50 * 10000;
-                var verifyTask = service.VerifyAsync();
+                var verifyTask = service.VerifyAsync(captureId, enrolled);
 
                 if (verifyTask == await Task.WhenAny(verifyTask, Task.Delay(TIMEOUT_SECONDS * 1000))) {
                     return await verifyTask;

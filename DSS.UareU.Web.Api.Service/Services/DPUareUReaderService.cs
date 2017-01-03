@@ -24,34 +24,31 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
         }
 
-        public Task<dynamic> VerifyAsync() 
+        // public Task<Nancy.Response> EnrollUser(List<string> tags) {
+        //     // Enrollment.CreateEnrollmentFmd
+
+        //     // save to db
+        //     return null; // return FMD    
+        // }
+
+        public Task<Nancy.Response> EnrollImageAsFMD(List<string> tags, byte[] image, int width, int height) 
         {
-            var readers = ReaderCollection.GetReaders();
+            // FeatureExtraction.CreateFmdFromFid
+/*
+            var id = Guid.NewGuid().ToString();
+            var img = CreateBitmap(image, width, height);
+            img.Save(id + ".jpg");
+*/
+            // save to db
+            return null; // return id             
+        }
+
+        public Task<dynamic> VerifyAsync(string captureId, List<string> enrollImages) 
+        {
+            // Comparison.Identify(captureFMD, enrolledFMDs, 1, 0.6)
             var tcs = new TaskCompletionSource<dynamic>();
 
-            if (readers.Count > 0)
-            {
-                var reader = readers.FirstOrDefault();
-                var opened = reader.Open(Constants.CapturePriority.DP_PRIORITY_EXCLUSIVE);
-                Thread.Sleep(550);
-                Console.WriteLine("Opened: " + opened.ToString());
-
-                if (opened == Constants.ResultCode.DP_SUCCESS)
-                {
-                    Thread.Sleep(1500);
-                    tcs.SetResult(new {});
-                }
-                else
-                {
-                    tcs.SetResult(new { Message = opened.ToString() });
-                }
-            
-                reader.Dispose();
-
-            } else
-            {
-                tcs.SetException(new Exception("No reader"));
-            }
+            tcs.SetResult(new { Message = opened.ToString() });
             
             return tcs.Task;
         }
