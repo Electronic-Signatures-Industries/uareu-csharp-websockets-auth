@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebHost", "WebHost\WebHost.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.Service", "DSS.UareU.Web.Api.Service\DSS.UareU.Web.Api.Service.csproj", "{9FF209D7-C82B-42E8-AF53-76AB17EE90E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfHost", "SelfHost\SelfHost.csproj", "{776640FB-188A-4D02-9E6E-F11BA91EB734}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9FF209D7-C82B-42E8-AF53-76AB17EE90E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FF209D7-C82B-42E8-AF53-76AB17EE90E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FF209D7-C82B-42E8-AF53-76AB17EE90E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{776640FB-188A-4D02-9E6E-F11BA91EB734}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{776640FB-188A-4D02-9E6E-F11BA91EB734}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{776640FB-188A-4D02-9E6E-F11BA91EB734}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{776640FB-188A-4D02-9E6E-F11BA91EB734}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
