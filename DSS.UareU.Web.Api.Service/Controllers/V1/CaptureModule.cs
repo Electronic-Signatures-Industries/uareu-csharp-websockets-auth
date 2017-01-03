@@ -17,6 +17,12 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
         public CaptureModule() : base("/api/v1/capture")
         {
+            Get["/{id}", true] = async (parameters, ct) =>
+            {
+                var imageTask = service.GetCaptureImageAsync(parameters.id);
+                return await imageTask;
+            };
+
             Post["/", true] = async (parameters, ct) =>
             {                
                 JsonSettings.MaxJsonLength = 50 * 10000;

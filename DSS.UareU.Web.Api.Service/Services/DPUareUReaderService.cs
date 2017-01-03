@@ -1,8 +1,10 @@
 ﻿using DPUruNet;
+using Nancy.Responses;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -56,14 +58,29 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         private Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code, string uri)
         {
+            var dict = new Dictionary<string, string>();
+            dict.Add("Location", uri);
             return new Nancy.Response{
-                StatusCode = code };
+                StatusCode = code,
+                Headers = dict
+            };
         }
 
-        private Nancy.Response BuildMessageResponse(string message)
+        private Nancy.Response BuildMessageResponse(Nancy.HttpStatusCode code, string message)
         {
+            var m = Encoding.UTF8.GetBytes(message);
             return new Nancy.Response{
-                StatusCode = code };
+                StatusCode = code,
+                Contents = a => a.Write(m, 0, m.Length),                
+            };
+        }
+
+        public Task<Nancy.Response> GetCaptureImageAsync(string id)
+        {
+            var img = new FileStream(id + ".jpg", FileMode.Open);
+            var resp = new StreamResponse(() => img, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
+
+            return Task.FromResult<Nancy.Response>(resp);
         }
 
         public Task<Nancy.Response> CaptureAsync()
@@ -99,20 +116,23 @@ namespace DSS.UareU.Web.Api.Service.Services
                             var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);
                             // send nancy resp
                             tcs.SetResult(resp);
+                        } else
+                        {
+                            tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No image captured"));
                         }
+
                         _reader.CancelCapture();
                         Thread.Sleep(1500);
                         _reader.Dispose();
-                        tcs.SetResult(BuildMessageResponse("No image captured"));
                     };
                 }
                 else
                 {
-                    tcs.SetResult(BuildMessageResponse(opened.ToString()));
+                    tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, opened.ToString()));
                 }
             } else
             {
-                tcs.SetResult(BuildMessageResponse("No reader"))
+                tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader"));
             }
 
             return tcs.Task;
