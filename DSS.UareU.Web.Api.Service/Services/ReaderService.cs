@@ -24,6 +24,16 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
         }
 
+        private Fmd CreateFMD(CaptureResult capture)
+        {
+            DataResult<Fmd> resultConversion = FeatureExtraction.CreateFmdFromFid(capture.Data, Constants.Formats.Fmd.ANSI);
+            if (resultConversion.ResultCode != Constants.ResultCode.DP_SUCCESS)
+            {
+                throw new Exception(resultConversion.ResultCode.ToString());
+            }
+
+            return resultConversion.Data;
+        }
 
         public Task<Nancy.Response> GetCaptureImageAsync(string id)
         {
@@ -58,6 +68,7 @@ namespace DSS.UareU.Web.Api.Service.Services
                         Console.WriteLine("Captured");
                         var view = res.Data.Views.FirstOrDefault();
                         if (view != null) {
+                            // view.
                             var id = Guid.NewGuid().ToString();
                             var img = CreateBitmap(view.RawImage, view.Width, view.Height);
                             img.Save(id + ".jpg");
