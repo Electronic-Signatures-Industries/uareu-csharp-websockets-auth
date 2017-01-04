@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Service.Services
 {
-    public class DPUareUReaderService
+    public class ReaderService : BaseService
     {
         Reader _reader;
         
@@ -24,53 +24,6 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
         }
 
-        // public Task<Nancy.Response> EnrollUser(List<string> tags) {
-        //     // Enrollment.CreateEnrollmentFmd
-
-        //     // save to db
-        //     return null; // return FMD    
-        // }
-
-        public Task<Nancy.Response> EnrollImageAsFMD(List<string> tags, byte[] image, int width, int height) 
-        {
-            // FeatureExtraction.CreateFmdFromFid
-/*
-            var id = Guid.NewGuid().ToString();
-            var img = CreateBitmap(image, width, height);
-            img.Save(id + ".jpg");
-*/
-            // save to db
-            return null; // return id             
-        }
-
-        public Task<dynamic> VerifyAsync(string captureId, List<string> enrollImages) 
-        {
-            // Comparison.Identify(captureFMD, enrolledFMDs, 1, 0.6)
-            var tcs = new TaskCompletionSource<dynamic>();
-
-            tcs.SetResult(new { Message = opened.ToString() });
-            
-            return tcs.Task;
-        }
-
-        private Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code, string uri)
-        {
-            var dict = new Dictionary<string, string>();
-            dict.Add("Location", uri);
-            return new Nancy.Response{
-                StatusCode = code,
-                Headers = dict
-            };
-        }
-
-        private Nancy.Response BuildMessageResponse(Nancy.HttpStatusCode code, string message)
-        {
-            var m = Encoding.UTF8.GetBytes(message);
-            return new Nancy.Response{
-                StatusCode = code,
-                Contents = a => a.Write(m, 0, m.Length),                
-            };
-        }
 
         public Task<Nancy.Response> GetCaptureImageAsync(string id)
         {

@@ -13,7 +13,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
     {
 
         const int TIMEOUT_SECONDS = 15;
-        DPUareUReaderService service = new DPUareUReaderService();
+        ReaderService service = new ReaderService();
 
         public CaptureModule() : base("/api/v1/capture")
         {
