@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Options;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,12 @@ namespace DSS.UareU.Web.Api.Service.Models
         [BsonRepresentation(MongoDB.Bson.BsonType.Binary)]
         public byte[] Image { get; set; }
 
+        [BsonRepresentation(MongoDB.Bson.BsonType.Binary)]
+        public byte[] FMD { get; set; }
 
+        public static IMongoCollection<FingerCapture> GetCollection()
+        {
+            return DBClient.GetCollection<FingerCapture>("fingerCapture");
+        }
     }
 }

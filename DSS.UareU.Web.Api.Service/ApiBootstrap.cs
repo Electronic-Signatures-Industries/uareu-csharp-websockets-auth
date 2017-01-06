@@ -14,9 +14,11 @@ namespace DSS.UareU.Web.Api.Service
     {
         public void Initialize(IPipelines pipelines)
         {
-            var cs = ConfigurationManager.AppSettings["DB"];
+            var cs = ConfigurationManager.AppSettings["db_connection_string"];
+            var dbname = ConfigurationManager.AppSettings["dbname"];
             RegisterModels.Bind();
             DBClient.Instance = new MongoClient(cs);
+            DBClient.Database = DBClient.Instance.GetDatabase(dbname);
         }
     }
 }

@@ -9,6 +9,18 @@ namespace DSS.UareU.Web.Api.Service
 {
     public static class DBClient
     {
-        public static MongoClient Instance { get; set; }
+        public static IMongoClient Instance { get; set; }
+        public static IMongoDatabase Database { get; set; }
+
+        public static IMongoCollection<T> GetCollection<T>(string name)
+        {
+            if (DBClient.Instance != null)
+            {
+                return DBClient.Database.GetCollection<T>(name);
+            } else
+            {
+                throw new Exception("DB not initialized");
+            }
+        }
     }
 }

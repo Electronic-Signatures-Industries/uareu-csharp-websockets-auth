@@ -1,4 +1,6 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Models;
+using MongoDB.Driver;
 using Nancy.Responses;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,29 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
         }
 
+        private string SaveCapture(CaptureResult capture, Fid.Fiv imageView)
+        {
+
+            var fmd = CreateFMD(capture);
+            var img = CreateBitmap(imageView.RawImage, imageView.Width, imageView.Height);
+
+            MemoryStream stream = new MemoryStream();
+            img.Save(stream, ImageFormat.Jpeg);
+            stream.Position = 0;
+
+            // var fmd2 = Importer.ImportFmd(fmd.Bytes, Constants.Formats.Fmd.ANSI, Constants.Formats.Fmd.ANSI);
+
+            var coll = FingerCapture.GetCollection();
+            var model = new FingerCapture
+            {
+                FMD = fmd.Bytes,
+                Image = stream.ToArray(),
+            };
+            coll.InsertOne(model);
+            stream.Close();
+            return model.Id;
+        }
+
         private Fmd CreateFMD(CaptureResult capture)
         {
             DataResult<Fmd> resultConversion = FeatureExtraction.CreateFmdFromFid(capture.Data, Constants.Formats.Fmd.ANSI);
@@ -37,8 +62,20 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         public Task<Nancy.Response> GetCaptureImageAsync(string id)
         {
-            var img = new FileStream(id + ".jpg", FileMode.Open);
-            var resp = new StreamResponse(() => img, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
+            var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);
+            var coll = FingerCapture.GetCollection();
+            var model = coll.Find(filter).FirstOrDefault();
+
+            if (model == null)
+            {
+                return Task.FromResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
+            }
+
+            MemoryStream stream = new MemoryStream(model.Image);
+            // Image img = Image.FromStream(stream);
+            // img.Save("test.jpg");
+            stream.Position = 0;
+            var resp = new StreamResponse(() => stream, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
 
             return Task.FromResult<Nancy.Response>(resp);
         }
@@ -67,12 +104,8 @@ namespace DSS.UareU.Web.Api.Service.Services
                     {
                         Console.WriteLine("Captured");
                         var view = res.Data.Views.FirstOrDefault();
-                        if (view != null) {
-                            // view.
-                            var id = Guid.NewGuid().ToString();
-                            var img = CreateBitmap(view.RawImage, view.Width, view.Height);
-                            img.Save(id + ".jpg");
-                            // save as guid.jpg
+                        if (view != null) {                            
+                            var id = SaveCapture(res, view);
                             // send as Location, 201
                             var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);
                             // send nancy resp
