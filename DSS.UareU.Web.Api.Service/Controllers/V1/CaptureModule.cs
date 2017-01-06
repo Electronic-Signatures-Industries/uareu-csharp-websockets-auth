@@ -17,6 +17,11 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
         public CaptureModule() : base("/api/v1/capture")
         {
+            Put["/{id}", true] = async (parameters, ct) =>
+            {
+                return await service.UpdateCaptureModel(null);
+            };
+
             Get["/{id}", true] = async (parameters, ct) =>
             {
                 var imageTask = service.GetCaptureImageAsync(parameters.id);

@@ -60,6 +60,11 @@ namespace DSS.UareU.Web.Api.Service.Services
             return resultConversion.Data;
         }
 
+        public Task<Nancy.Response> UpdateCaptureModel(object a)
+        {
+            return null;
+        }
+
         public Task<Nancy.Response> GetCaptureImageAsync(string id)
         {
             var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);

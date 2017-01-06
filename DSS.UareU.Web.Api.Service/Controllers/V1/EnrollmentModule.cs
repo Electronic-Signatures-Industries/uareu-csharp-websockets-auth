@@ -15,16 +15,16 @@ namespace DSS.UareU.Web.Api.Service.Controllers
     public class EnrollmentModule : NancyModule
     {
         const int TIMEOUT_SECONDS = 30;
-        VerificationService service = new VerificationService();
+        ComparisonService service = new ComparisonService();
 
         public EnrollmentModule() : base("/api")
         {
             Post["/enroll/user", true] = async (parameters, ct) =>
             {
-                var verifyReqPayload = this.Bind<VerificationRequestMediaType>();
+                var verifyReqPayload = this.Bind<ComparisonRequestMediaType>();
 
                 JsonSettings.MaxJsonLength = 50 * 10000;
-                var verifyTask = service.VerifyAsync(verifyReqPayload.CaptureId, verifyReqPayload.EnrolledIds);
+                var verifyTask = service.IdentifyAsync(verifyReqPayload.CaptureId, verifyReqPayload.EnrolledIds);
 
                 if (verifyTask == await Task.WhenAny(verifyTask, Task.Delay(TIMEOUT_SECONDS * 1000)))
                 {
@@ -38,10 +38,10 @@ namespace DSS.UareU.Web.Api.Service.Controllers
 
             Post["/enroll/image", true] = async (parameters, ct) =>
             {
-                var verifyReqPayload = this.Bind<VerificationRequestMediaType>();
+                var verifyReqPayload = this.Bind<ComparisonRequestMediaType>();
 
                 JsonSettings.MaxJsonLength = 50 * 10000;
-                var verifyTask = service.VerifyAsync(verifyReqPayload.CaptureId, verifyReqPayload.EnrolledIds);
+                var verifyTask = service.IdentifyAsync(verifyReqPayload.CaptureId, verifyReqPayload.EnrolledIds);
 
                 if (verifyTask == await Task.WhenAny(verifyTask, Task.Delay(TIMEOUT_SECONDS * 1000)))
                 {

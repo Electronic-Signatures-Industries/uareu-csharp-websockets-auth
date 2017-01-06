@@ -14,15 +14,15 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
     public class IdentifyModule : NancyModule
     {
         const int TIMEOUT_SECONDS = 10;
-        VerificationService service = new VerificationService();
+        ComparisonService service = new ComparisonService();
 
-        public IdentifyModule() : base("/api/v1")
+        public IdentifyModule() : base("/api/v1/comparison")
         {
-            Post["/verify", true] = async (parameters, ct) =>
+            Post["/identify", true] = async (parameters, ct) =>
             {
-                var verifyReqPayload = this.Bind<VerificationRequestMediaType>();
-                JsonSettings.MaxJsonLength = 50 * 10000;
-                var verifyTask = service.VerifyAsync(verifyReqPayload.CaptureId, verifyReqPayload.EnrolledIds);
+                var request = this.Bind<ComparisonRequestMediaType>();
+                // JsonSettings.MaxJsonLength = 50 * 10000;
+                var verifyTask = service.IdentifyAsync(request.CaptureId, request.EnrolledIds);
 
                 if (verifyTask == await Task.WhenAny(verifyTask, Task.Delay(TIMEOUT_SECONDS * 1000))) {
                     return await verifyTask;

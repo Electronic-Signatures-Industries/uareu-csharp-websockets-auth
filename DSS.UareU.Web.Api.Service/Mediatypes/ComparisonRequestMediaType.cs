@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Service.Mediatypes
 {
-    public class VerificationRequestMediaType
+    public class ComparisonRequestMediaType
     {
         public string CaptureId { get; set; }
         public string[] EnrolledIds { get; set; }

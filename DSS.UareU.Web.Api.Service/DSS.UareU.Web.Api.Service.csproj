@@ -76,15 +76,14 @@
     <Compile Include="Controllers\V1\EnrollmentModule.cs" />
     <Compile Include="Controllers\V1\IdentifyModule.cs" />
     <Compile Include="DBClient.cs" />
-    <Compile Include="Mediatypes\VerificationRequestMediaType.cs" />
+    <Compile Include="Mediatypes\ComparisonRequestMediaType.cs" />
     <Compile Include="Models\FingerCapture.cs" />
     <Compile Include="Models\RegisterModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BaseService.cs" />
     <Compile Include="Services\ReaderService.cs" />
     <Compile Include="Services\EnrollmentService.cs" />
-    <Compile Include="Services\SampleService.cs" />
-    <Compile Include="Services\VerificationService.cs" />
+    <Compile Include="Services\ComparisonService.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
