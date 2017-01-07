@@ -12,6 +12,8 @@ namespace DSS.UareU.Web.Api.Service.Models
         public static void Bind()
         {
             BsonClassMap.RegisterClassMap<FingerCapture>();
+            BsonClassMap.RegisterClassMap<User>();
+            BsonClassMap.RegisterClassMap<Account>();
         }
     }
 }

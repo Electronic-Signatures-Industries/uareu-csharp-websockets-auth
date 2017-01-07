@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Service.Models
 {
-    public class FingerCapture
+    public class User
     {
         [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
         public string Id { get; set; }
@@ -18,18 +18,19 @@ namespace DSS.UareU.Web.Api.Service.Models
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string AccountId { get; set; }
 
+        public DateTime Created { get; set; }
+
+        public string Name { get; set; }
+
+        public string ApiSecret { get; set; }
+
         [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfDocuments)]
-        public Dictionary<string, string> Tags { get; set; }
+        public Dictionary<string, string> AclClaims { get; set; }
 
-        [BsonRepresentation(MongoDB.Bson.BsonType.Binary)]
-        public byte[] Image { get; set; }
-
-        [BsonRepresentation(MongoDB.Bson.BsonType.Binary)]
-        public byte[] FMD { get; set; }
-
-        public static IMongoCollection<FingerCapture> GetCollection()
+        public static IMongoCollection<User> GetCollection()
         {
-            return DBClient.GetCollection<FingerCapture>("fingerCapture");
+            return DBClient.GetCollection<User>("users");
         }
+
     }
 }
