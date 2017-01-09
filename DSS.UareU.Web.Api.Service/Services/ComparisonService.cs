@@ -13,7 +13,7 @@ namespace DSS.UareU.Web.Api.Service.Services
     {
         private const int DPFJ_PROBABILITY_ONE = 0x7fffffff;
 
-        public async Task<dynamic> IdentifyAsync(string captureId, IEnumerable<string> enrollIds)
+        public async Task<bool> IdentifyAsync(string captureId, IEnumerable<string> enrollIds)
         {
             // var tcs = new TaskCompletionSource<dynamic>();
             // See the SDK documentation for an explanation on threshold scores.
@@ -30,16 +30,26 @@ namespace DSS.UareU.Web.Api.Service.Services
             )
             .ToListAsync();
 
-            /*
-            IdentifyResult identifyResult  = Comparison.Identify(current.First().FMD, 0, enrolled.First(), thresholdScore, 2);
-            if (identifyResult.ResultCode != Constants.ResultCode.DP_SUCCESS)
+            bool result = false;
+            var currentRow = current.FirstOrDefault();
+
+            if (currentRow != null && enrolled.Count == enrollIds.Count())
             {
-                // throw new Exception(identifyResult.ResultCode.ToString());
+                var currentFMD = LoadFMD(currentRow.FMD);
+                var enrolledFMD = enrolled.Select(i => LoadFMD(i.FMD));
+                
+                IdentifyResult identifyResult  = Comparison.Identify(currentFMD, 0, enrolledFMD, thresholdScore, 2);
+                if (identifyResult.ResultCode != Constants.ResultCode.DP_SUCCESS)
+                {
+                    throw new Exception(identifyResult.ResultCode.ToString());
+                }
+
+                // identifyResult.Indexes
+                
             }
-            */
             // tcs.SetResult(new { Message = opened.ToString() });
 
-            return new { };
+            return result;
         }
 
         private Fmd LoadFMD(byte[] raw)
