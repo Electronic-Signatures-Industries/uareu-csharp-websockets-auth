@@ -77,6 +77,7 @@
     <Compile Include="Controllers\V1\IdentifyModule.cs" />
     <Compile Include="DBClient.cs" />
     <Compile Include="Mediatypes\ComparisonRequestMediaType.cs" />
+    <Compile Include="Mediatypes\ComparisonResponseMediaType.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\FingerCapture.cs" />
     <Compile Include="Models\RegisterModels.cs" />

@@ -1,4 +1,5 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Mediatypes;
 using DSS.UareU.Web.Api.Service.Models;
 using MongoDB.Driver;
 using System;
@@ -13,9 +14,8 @@ namespace DSS.UareU.Web.Api.Service.Services
     {
         private const int DPFJ_PROBABILITY_ONE = 0x7fffffff;
 
-        public async Task<bool> IdentifyAsync(string captureId, IEnumerable<string> enrollIds)
+        public async Task<ComparisonResponseMediaType> IdentifyAsync(string captureId, IEnumerable<string> enrollIds)
         {
-            // var tcs = new TaskCompletionSource<dynamic>();
             // See the SDK documentation for an explanation on threshold scores.
             int thresholdScore = DPFJ_PROBABILITY_ONE * 1 / 100000;
 
@@ -30,7 +30,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             )
             .ToListAsync();
 
-            bool result = false;
+            var result = new ComparisonResponseMediaType();
             var currentRow = current.FirstOrDefault();
 
             if (currentRow != null && enrolled.Count == enrollIds.Count())
@@ -44,10 +44,37 @@ namespace DSS.UareU.Web.Api.Service.Services
                     throw new Exception(identifyResult.ResultCode.ToString());
                 }
 
-                // identifyResult.Indexes
-                
+                if (identifyResult.Indexes.Length > 0)
+                {
+                    int matches = 0;
+                    int noMatches = 0;
+
+                    Action<int> calc =
+                    i =>
+                    {
+                        if (i > 0)
+                        {
+                            noMatches++;
+                        }
+                        else
+                        {
+                            matches++;
+                        }
+                    };
+
+                    foreach (var pair in identifyResult.Indexes)
+                    {
+                        Console.WriteLine(pair[0] + " " + pair[1]);
+                        // calc(pair[0]); // no hit
+                        calc(pair[1]); // hit
+                    }
+
+                    result.IsMatch = matches > noMatches;
+                } else
+                {
+                    result.IsMatch = false;
+                }
             }
-            // tcs.SetResult(new { Message = opened.ToString() });
 
             return result;
         }
