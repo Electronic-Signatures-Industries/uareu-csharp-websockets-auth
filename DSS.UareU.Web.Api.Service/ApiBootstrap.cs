@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using Nancy.Authentication.Stateless;
 using Nancy.Bootstrapper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,6 +24,13 @@ namespace DSS.UareU.Web.Api.Service
             DBClient.Instance = new MongoClient(cs);
             DBClient.Database = DBClient.Instance.GetDatabase(dbname);
 
+            pipelines.AfterRequest += ctx =>
+            {
+                ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                ctx.Response.Headers.Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+                ctx.Response.Headers.Add("Access-Control-Allow-Methods", "DELETE, GET, POST, PUT");
+            };
+
             var secret = ConfigurationManager.AppSettings["TokenSecret"];
             var statelessAuthConfiguration = new StatelessAuthenticationConfiguration(ctx =>
             {
@@ -31,15 +39,14 @@ namespace DSS.UareU.Web.Api.Service
                 try
                 {
                     var payloadJSON = Jose.JWT.Decode(jwtToken, Encoding.UTF8.GetBytes(secret));
-                    var payload = Jose.JWT.Decode<JwtToken>(jwtToken, Encoding.UTF8.GetBytes(secret));
-
+                    var payload = JsonConvert.DeserializeObject<JwtToken>(payloadJSON);
                     var tokenExpires = DateTime.FromBinary(payload.exp);
 
                     if (tokenExpires > DateTime.UtcNow)
                     {
-                        ApiUser user = new ApiUser { UserName = payload.sub };
+                        ApiUser user = new ApiUser { UserName = payload.email };
                         var list = new List<string>();
-                        list.Add(payload.account);
+                        list.Add(payload.email);
                         user.Claims = list;
                         return user;
                     }

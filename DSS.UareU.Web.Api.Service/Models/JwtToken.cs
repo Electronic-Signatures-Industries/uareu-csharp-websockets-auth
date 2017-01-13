@@ -8,8 +8,14 @@ namespace DSS.UareU.Web.Api.Service.Models
 {
     public class JwtToken
     {
-        public string sub;
-        public long exp;
-        public string account;
+        public JwtToken()
+        {
+
+        }
+
+
+        public Dictionary<string, string> sub { get; set; }
+        public long exp { get; set; }
+        public string email { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers
                var payload = new Dictionary<string, object>()
                 {
                     { "account", parameters.account },
-                    { "sub", "molekilla@gmail.com" },
+                    { "email", "molekilla@gmail.com" },
                     { "exp", (new DateTime()).AddHours(12).ToBinary() }
                 };
 
