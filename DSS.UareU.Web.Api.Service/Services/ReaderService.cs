@@ -1,4 +1,5 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Mediatypes;
 using DSS.UareU.Web.Api.Service.Models;
 using MongoDB.Driver;
 using Nancy.Responses;
@@ -28,9 +29,17 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         private string SaveCapture(CaptureResult capture, Fid.Fiv imageView)
         {
-
+            // FMD
             var fmd = CreateFMD(capture);
+
+            // Image
             var img = CreateBitmap(imageView.RawImage, imageView.Width, imageView.Height);
+
+            // Compress the image
+            byte[] compressedData = DPUruNet.WSQ.CompressNIST(capture.Data, 94, 24000);
+
+            // Decompress the image
+            // byte[] uncompressedData = DPUruNet.WSQ.UnCompressNIST(compressedData, WSQ.IMAGE_FORMAT.DPFJ_FID_ISO_19794_4_2005);
 
             MemoryStream stream = new MemoryStream();
             img.Save(stream, ImageFormat.Jpeg);
@@ -43,6 +52,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             {
                 FMD = fmd.Bytes,
                 Image = stream.ToArray(),
+                WSQImage = compressedData,
             };
             coll.InsertOne(model);
             stream.Close();
@@ -65,7 +75,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             return null;
         }
 
-        public Task<Nancy.Response> GetCaptureImageAsync(string id)
+        public Task GetCaptureImageAsync(string id, bool sendWSQ)
         {
             var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);
             var coll = FingerCapture.GetCollection();
@@ -76,13 +86,22 @@ namespace DSS.UareU.Web.Api.Service.Services
                 return Task.FromResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
 
-            MemoryStream stream = new MemoryStream(model.Image);
-            // Image img = Image.FromStream(stream);
-            // img.Save("test.jpg");
-            stream.Position = 0;
-            var resp = new StreamResponse(() => stream, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
+            MemoryStream stream = new MemoryStream();
 
-            return Task.FromResult<Nancy.Response>(resp);
+            if (sendWSQ)
+            {
+                var content = Convert.ToBase64String(model.WSQImage);
+       
+                return Task.FromResult(new CaptureResponseMediaType { Data = content });
+            }
+            else
+            {
+                stream.Write(model.Image, 0, model.Image.Length);
+                stream.Position = 0;
+                var resp = new StreamResponse(() => stream, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
+                return Task.FromResult<Nancy.Response>(resp);
+            }
+
         }
 
         public Task<Nancy.Response> CaptureAsync()
@@ -165,7 +184,7 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         }
 
-        public Bitmap CreateBitmap(byte[] bytes, int width, int height)
+        private Bitmap CreateBitmap(byte[] bytes, int width, int height)
         {
             byte[] rgbBytes = new byte[bytes.Length * 3];
 

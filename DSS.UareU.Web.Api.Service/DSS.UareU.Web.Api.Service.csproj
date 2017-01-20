@@ -89,7 +89,10 @@
     <Compile Include="Controllers\V1\EnrollmentModule.cs" />
     <Compile Include="Controllers\V1\IdentifyModule.cs" />
     <Compile Include="DBClient.cs" />
+    <Compile Include="Extras\NFIQ.cs" />
+    <Compile Include="Extras\WSQ.cs" />
     <Compile Include="Mediatypes\ComparisonRequestMediaType.cs" />
+    <Compile Include="Mediatypes\CaptureResponseMediaType.cs" />
     <Compile Include="Mediatypes\ComparisonResponseMediaType.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\ApiUser.cs" />

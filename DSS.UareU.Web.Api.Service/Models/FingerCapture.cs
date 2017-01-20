@@ -25,6 +25,9 @@ namespace DSS.UareU.Web.Api.Service.Models
         public byte[] Image { get; set; }
 
         [BsonRepresentation(MongoDB.Bson.BsonType.Binary)]
+        public byte[] WSQImage { get; set; }
+
+        [BsonRepresentation(MongoDB.Bson.BsonType.Binary)]
         public byte[] FMD { get; set; }
 
         public static IMongoCollection<FingerCapture> GetCollection()
