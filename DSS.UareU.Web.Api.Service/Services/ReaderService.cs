@@ -1,4 +1,5 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Extras;
 using DSS.UareU.Web.Api.Service.Mediatypes;
 using DSS.UareU.Web.Api.Service.Models;
 using MongoDB.Driver;
@@ -55,8 +56,8 @@ namespace DSS.UareU.Web.Api.Service.Services
 
             var model = new FingerCapture
             {
-                FMD = fmd.Bytes,
-                Image = stream.ToArray(),
+                FMD = Encryption.Encrypt(fmd.Bytes),
+                Image = Encryption.Encrypt(stream.ToArray()),
                 WSQImage = compressedData,
             };
             stream.Close();
@@ -109,6 +110,9 @@ namespace DSS.UareU.Web.Api.Service.Services
                 return Task.FromResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
 
+            // decrypt
+            var image = Encryption.Decrypt(model.Image);
+
             MemoryStream stream = new MemoryStream();
 
             if (sendWSQ)
@@ -119,7 +123,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
             else
             {
-                stream.Write(model.Image, 0, model.Image.Length);
+                stream.Write(image, 0, image.Length);
                 stream.Position = 0;
                 var resp = new StreamResponse(() => stream, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
                 return Task.FromResult<Nancy.Response>(resp);
@@ -173,6 +177,7 @@ namespace DSS.UareU.Web.Api.Service.Services
                 }
             } else
             {
+                _reader.Dispose();
                 tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader"));
             }
 

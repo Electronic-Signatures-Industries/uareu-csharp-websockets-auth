@@ -1,4 +1,5 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Extras;
 using DSS.UareU.Web.Api.Service.Mediatypes;
 using DSS.UareU.Web.Api.Service.Models;
 using MongoDB.Driver;
@@ -81,7 +82,9 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         private Fmd LoadFMD(byte[] raw)
         {
-            var res = Importer.ImportFmd(raw, Constants.Formats.Fmd.ANSI, Constants.Formats.Fmd.ANSI);
+            // decrypt
+            var data = Encryption.Decrypt(raw);
+            var res = Importer.ImportFmd(data, Constants.Formats.Fmd.ANSI, Constants.Formats.Fmd.ANSI);
 
             if (res.ResultCode != Constants.ResultCode.DP_SUCCESS)
             {
