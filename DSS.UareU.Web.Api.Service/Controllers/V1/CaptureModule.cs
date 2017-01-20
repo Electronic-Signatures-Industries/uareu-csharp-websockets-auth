@@ -38,7 +38,14 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             Post["/", true] = async (parameters, ct) =>
             {                
                 JsonSettings.MaxJsonLength = 50 * 10000;
-                var captureTask = service.CaptureAsync();
+                bool temporary = false;
+
+                if (Request.Query["temporary"] != null)
+                {
+                    temporary = true;
+                }
+
+                var captureTask = service.CaptureAsync(temporary);
 
                 if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000))) {
                     return await captureTask;

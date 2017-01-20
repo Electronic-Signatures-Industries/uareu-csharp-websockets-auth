@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,12 @@ namespace DSS.UareU.Web.Api.Service.Services
 {
     public class ReaderService : BaseService
     {
+        CacheItemPolicy CACHE_POLICY = new CacheItemPolicy
+        {
+            AbsoluteExpiration = DateTime.Now.AddHours(2)
+        };
         Reader _reader;
+        static MemoryCache _cache = new MemoryCache("dss-a2f-fp");
         
         public void Close()
         {
@@ -27,7 +33,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
         }
 
-        private string SaveCapture(CaptureResult capture, Fid.Fiv imageView)
+        private string SaveCapture(bool useCache, CaptureResult capture, Fid.Fiv imageView)
         {
             // FMD
             var fmd = CreateFMD(capture);
@@ -47,16 +53,26 @@ namespace DSS.UareU.Web.Api.Service.Services
 
             // var fmd2 = Importer.ImportFmd(fmd.Bytes, Constants.Formats.Fmd.ANSI, Constants.Formats.Fmd.ANSI);
 
-            var coll = FingerCapture.GetCollection();
             var model = new FingerCapture
             {
                 FMD = fmd.Bytes,
                 Image = stream.ToArray(),
                 WSQImage = compressedData,
             };
-            coll.InsertOne(model);
             stream.Close();
-            return model.Id;
+
+            if (useCache)
+            {
+                var id = Guid.NewGuid().ToString();
+                _cache.Add(id, model, CACHE_POLICY);
+                return id;
+            }
+            else
+            {
+                var coll = FingerCapture.GetCollection();
+                coll.InsertOne(model);
+                return model.Id;
+            }
         }
 
         private Fmd CreateFMD(CaptureResult capture)
@@ -77,9 +93,16 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         public Task GetCaptureImageAsync(string id, bool sendWSQ)
         {
-            var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);
-            var coll = FingerCapture.GetCollection();
-            var model = coll.Find(filter).FirstOrDefault();
+            FingerCapture model = null;
+            if (_cache[id] == null)
+            {
+                var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);
+                var coll = FingerCapture.GetCollection();
+                model = coll.Find(filter).FirstOrDefault();
+            } else
+            {
+                model = (FingerCapture)_cache[id];
+            }
 
             if (model == null)
             {
@@ -104,7 +127,7 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         }
 
-        public Task<Nancy.Response> CaptureAsync()
+        public Task<Nancy.Response> CaptureAsync(bool useMemCache)
         {
             var readers = ReaderCollection.GetReaders();
             var tcs = new TaskCompletionSource<Nancy.Response>();
@@ -129,7 +152,7 @@ namespace DSS.UareU.Web.Api.Service.Services
                         Console.WriteLine("Captured");
                         var view = res.Data.Views.FirstOrDefault();
                         if (view != null) {                            
-                            var id = SaveCapture(res, view);
+                            var id = SaveCapture(useMemCache, res, view);
                             // send as Location, 201
                             var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);
                             // send nancy resp
