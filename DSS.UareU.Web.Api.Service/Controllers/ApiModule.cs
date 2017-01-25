@@ -1,6 +1,8 @@
 ﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Models;
 using DSS.UareU.Web.Api.Service.Services;
 using Jose;
+using MongoDB.Driver;
 using Nancy;
 using System;
 using System.Collections.Generic;
@@ -17,12 +19,34 @@ namespace DSS.UareU.Web.Api.Service.Controllers
         {
             Get["/demo_token/{account}"] = parameters =>
            {
+               var model = new Account
+               {
+                   Created = DateTime.Now,
+                   Email = "molekilla@gmail.com",
+                   Name = "Demo",
+               };
+               var accounts = Account.GetCollection();
+               string id = parameters.account;
+               var current = accounts.FindSync(
+                   Builders<Account>.Filter.Where(i => i.Id == id)
+               );
+
+               var acct = current.FirstOrDefault();
+               if (acct == null)
+               {
+                   accounts.InsertOne(model);
+               } else
+               {
+
+                   model = acct;
+               }
+
                var secretKey = ConfigurationManager.AppSettings["TokenSecret"];
                var payload = new Dictionary<string, object>()
                 {
-                    { "account", parameters.account },
-                    { "email", "molekilla@gmail.com" },
-                    { "exp", (new DateTime()).AddHours(12).ToBinary() }
+                    { "account", model.Id },
+                    { "email", model.Email },
+                    { "exp", DateTime.Now.AddHours(12).ToBinary() }
                 };
 
 

@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nancy.Security;
+
 
 namespace DSS.UareU.Web.Api.Service.Controllers.V1
 {
@@ -20,6 +22,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
         {
             Post["/identify", true] = async (parameters, ct) =>
             {
+                this.RequiresAuthentication();
                 var request = this.Bind<ComparisonRequestMediaType>();
                 // JsonSettings.MaxJsonLength = 50 * 10000;
                 var verifyTask = service.IdentifyAsync(request.CaptureId, request.EnrolledIds);

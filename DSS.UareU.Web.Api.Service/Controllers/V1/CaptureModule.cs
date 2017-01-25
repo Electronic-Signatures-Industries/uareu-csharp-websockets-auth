@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nancy.Security;
 
 namespace DSS.UareU.Web.Api.Service.Controllers.V1
 {
@@ -24,7 +25,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
             Get["/{id}", true] = async (parameters, ct) =>
             {
-
+                this.RequiresAuthentication();
                 bool extended = false;
 
                 if (Request.Query["extended"] != null)
@@ -40,7 +41,8 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             };
 
             Post["/", true] = async (parameters, ct) =>
-            {                
+            {
+                this.RequiresAuthentication();
                 JsonSettings.MaxJsonLength = 50 * 10000;
                 bool temporary = false;
 

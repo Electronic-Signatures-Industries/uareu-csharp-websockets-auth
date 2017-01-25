@@ -32,7 +32,7 @@ namespace DSS.UareU.Web.Api.Service.Models
 
         public static IMongoCollection<FingerCapture> GetCollection()
         {
-            return DBClient.GetCollection<FingerCapture>("fingerCapture");
+            return DBClient.GetCollection<FingerCapture>("captures");
         }
     }
 }
