@@ -25,13 +25,17 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             Get["/{id}", true] = async (parameters, ct) =>
             {
 
-                bool wsq = false;
+                bool extended = false;
 
-                if (Request.Query["wsq"] != null)
+                if (Request.Query["extended"] != null)
                 {
-                    wsq = true;
+                    extended = true;
                 }
-                var imageTask = service.GetCaptureImageAsync(parameters.id, wsq);
+                
+                var imageTask = service.GetCaptureImageAsync(parameters.id, new Mediatypes.FindCaptureOptions
+                {
+                    Extended = extended,
+                });
                 return await imageTask;
             };
 

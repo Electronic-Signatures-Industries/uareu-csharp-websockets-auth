@@ -92,7 +92,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             return null;
         }
 
-        public Task GetCaptureImageAsync(string id, bool sendWSQ)
+        public Task GetCaptureImageAsync(string id, FindCaptureOptions options)
         {
             FingerCapture model = null;
             if (_cache[id] == null)
@@ -115,11 +115,12 @@ namespace DSS.UareU.Web.Api.Service.Services
 
             MemoryStream stream = new MemoryStream();
 
-            if (sendWSQ)
+            if (options.Extended)
             {
-                var content = Convert.ToBase64String(model.WSQImage);
-       
-                return Task.FromResult(new CaptureResponseMediaType { Data = content });
+                var fmd = Convert.ToBase64String(model.FMD);
+                var wsq = Convert.ToBase64String(model.WSQImage);
+
+                return Task.FromResult(new CaptureResponseMediaType { Fmd = fmd, Wsq = wsq });
             }
             else
             {

@@ -105,6 +105,7 @@
     <Compile Include="Mediatypes\ComparisonRequestMediaType.cs" />
     <Compile Include="Mediatypes\CaptureResponseMediaType.cs" />
     <Compile Include="Mediatypes\ComparisonResponseMediaType.cs" />
+    <Compile Include="Mediatypes\FindCaptureOptions.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\ApiUser.cs" />
     <Compile Include="Models\FingerCapture.cs" />

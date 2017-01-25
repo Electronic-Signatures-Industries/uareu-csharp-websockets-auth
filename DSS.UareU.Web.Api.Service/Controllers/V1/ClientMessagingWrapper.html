@@ -16,10 +16,44 @@
             if (event.data.name === 'device_info') {
                 axios.get('/api/v1/device_info')
                   .then(function (response) {
-                      event.source.window.postMessage(response.data, event.origin);
+                      event.source.window.postMessage({ type: event.data.name, data: response.data }, event.origin);
                   })
                   .catch(function (error) {
                       console.log(error);
+                      event.source.window.postMessage({ err: error }, event.origin);
+                  });
+            }
+            else if (event.data.name === 'get_capture') {
+                axios.post('/api/v1/capture')
+                  .then(function (response) {
+                      if (response.status === 201) {
+                          var url = location.origin + '/' + response.headers.location;
+                          var id = url.split('/').reverse()[0];
+                          var data = { type: event.data.name, url: url, id: id };
+                          event.source.window.postMessage(data, event.origin);
+                      } else {
+                          event.source.window.postMessage({ err: 'error' }, event.origin);
+                      }
+                  })
+                  .catch(function (error) {
+                      console.log(error);
+                      event.source.window.postMessage({ err: error }, event.origin);
+                  });
+            }
+            else if (event.data.name === 'get_capture_extended') {
+                var id = event.data.args[0];
+                axios.get('/api/v1/capture/' + id + '?extended')
+                  .then(function (response) {
+                      if (response.status === 200) {
+                          var data = { type: event.data.name, wsq: response.data.wsq, fmd: response.data.fmd, id: id };
+                          event.source.window.postMessage(data, event.origin);
+                      } else {
+                          event.source.window.postMessage({ err: 'error' }, event.origin);
+                      }
+                  })
+                  .catch(function (error) {
+                      console.log(error);
+                      event.source.window.postMessage({ err: error }, event.origin);
                   });
             }
         }
