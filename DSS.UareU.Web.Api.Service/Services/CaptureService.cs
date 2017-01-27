@@ -1,10 +1,12 @@
-﻿using DSS.UareU.Web.Api.Service.Models;
+﻿using DPUruNet;
+using DSS.UareU.Web.Api.Service.Models;
 using DSS.UareU.Web.Api.Shared;
 using DSS.UareU.Web.Api.Shared.Mediatypes;
 using MongoDB.Driver;
 using Nancy.Responses;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,15 +16,48 @@ namespace DSS.UareU.Web.Api.Service.Services
 {
     public class CaptureService
     {
-        Nancy.Response BuildMessageResponse(Nancy.HttpStatusCode code, string message)
+        public void RemoveCapture(string id)
         {
-            var m = Encoding.UTF8.GetBytes(message);
-            return new Nancy.Response
-            {
-                StatusCode = code,
-                Contents = a => a.Write(m, 0, m.Length),
-            };
+            var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);
+            var coll = FingerCapture.GetCollection();
+            coll.DeleteOne(filter);
+
         }
+
+        public Task<Nancy.Response> SaveCaptureAsync(byte[] fmd, byte[] compressedImage)
+        {
+            // Decompress the image
+            byte[] uncompressedData = DPUruNet.WSQ.UnCompressNIST(compressedImage, WSQ.IMAGE_FORMAT.DPFJ_FID_ANSI_381_2004);
+            
+            var fid = Importer.ImportFid(uncompressedData, Constants.Formats.Fid.ANSI);
+
+            if (fid.ResultCode == Constants.ResultCode.DP_SUCCESS)
+            {
+                var imageView = fid.Data.Views.FirstOrDefault();
+                // Image
+                var img = BitmapConverter.CreateBitmap(imageView.RawImage, imageView.Width, imageView.Height);
+
+                MemoryStream stream = new MemoryStream();
+                img.Save(stream, ImageFormat.Jpeg);
+                stream.Position = 0;
+
+                var model = new FingerCapture
+                {
+                    FMD = Encryption.Encrypt(fmd),
+                    Image = Encryption.Encrypt(stream.ToArray()),
+                    WSQImage = Encryption.Encrypt(compressedImage),
+                };
+
+                var coll = FingerCapture.GetCollection();
+                coll.InsertOne(model);
+                return Task.FromResult(ResponseMessageBuilder.BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + model.Id));
+            }
+            else
+            {
+                return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "Invalid data"));
+            }
+        }
+
 
         public Task GetCaptureImageAsync(string id, FindCaptureOptions options)
         {
@@ -33,7 +68,7 @@ namespace DSS.UareU.Web.Api.Service.Services
 
             if (model == null)
             {
-                return Task.FromResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
+                return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
 
             // decrypt
@@ -43,8 +78,8 @@ namespace DSS.UareU.Web.Api.Service.Services
 
             if (options.Extended)
             {
-                var fmd = Convert.ToBase64String(model.FMD);
-                var wsq = Convert.ToBase64String(model.WSQImage);
+                var fmd = Encryption.DecryptToBase64(model.FMD);
+                var wsq = Encryption.DecryptToBase64(model.WSQImage);
 
                 return Task.FromResult(new CaptureResponseMediaType { Fmd = fmd, Wsq = wsq });
             }

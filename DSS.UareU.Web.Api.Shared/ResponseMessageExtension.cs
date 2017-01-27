@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Client.Services
+namespace DSS.UareU.Web.Api.Shared
 {
-    public class BaseService
+    public static class ResponseMessageBuilder
     {
-        public Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code, string uri)
+        public static Nancy.Response BuildLocationResponse(Nancy.HttpStatusCode code, string uri)
         {
             var dict = new Dictionary<string, string>();
             dict.Add("Location", uri);
@@ -19,7 +19,7 @@ namespace DSS.UareU.Web.Api.Client.Services
             };
         }
 
-        public Nancy.Response BuildMessageResponse(Nancy.HttpStatusCode code, string message)
+        public static Nancy.Response BuildMessageResponse(Nancy.HttpStatusCode code, string message)
         {
             var m = Encoding.UTF8.GetBytes(message);
             return new Nancy.Response

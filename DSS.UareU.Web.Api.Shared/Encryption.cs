@@ -23,5 +23,10 @@ namespace DSS.UareU.Web.Api.Shared
             return SecurityDriven.Inferno.EtM_CBC.Decrypt(key, new ArraySegment<byte>(cipher));
 
         }
+
+        public static string DecryptToBase64(byte[] cipher)
+        {
+            return Convert.ToBase64String(Decrypt(cipher));
+        }
     }
 }

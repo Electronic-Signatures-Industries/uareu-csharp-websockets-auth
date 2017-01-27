@@ -52,9 +52,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\BaseService.cs" />
     <Compile Include="Services\ReaderService.cs" />
-    <Compile Include="Services\ShortSecureTokens.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Controllers\V1\ClientMessagingWrapper.html" />

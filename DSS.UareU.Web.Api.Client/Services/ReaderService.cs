@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Client.Services
 {
-    public class ReaderService : BaseService
+    public class ReaderService
     {
         CacheItemPolicy CACHE_POLICY = new CacheItemPolicy
         {
@@ -60,13 +60,10 @@ namespace DSS.UareU.Web.Api.Client.Services
             var fmd = CreateFMD(capture);
 
             // Image
-            var img = CreateBitmap(imageView.RawImage, imageView.Width, imageView.Height);
+            var img = BitmapConverter.CreateBitmap(imageView.RawImage, imageView.Width, imageView.Height);
 
             // Compress the image
             byte[] compressedData = DPUruNet.WSQ.CompressNIST(capture.Data, 94, 24000);
-
-            // Decompress the image
-            // byte[] uncompressedData = DPUruNet.WSQ.UnCompressNIST(compressedData, WSQ.IMAGE_FORMAT.DPFJ_FID_ISO_19794_4_2005);
 
             MemoryStream stream = new MemoryStream();
             img.Save(stream, ImageFormat.Jpeg);
@@ -114,7 +111,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
             if (model == null)
             {
-                return Task.FromResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
+                return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
 
             MemoryStream stream = new MemoryStream();
@@ -162,14 +159,14 @@ namespace DSS.UareU.Web.Api.Client.Services
                         var view = res.Data.Views.FirstOrDefault();
                         if (view != null) {                            
                             var id = SaveCapture(res, view);
-                            var token = GetSecureToken(username, id);
+                            // var token = GetSecureToken(username, id);
                             // send as Location, 201
-                            var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id + "?s=" + token);
+                            var resp = ResponseMessageBuilder.BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);
                             // send nancy resp
                             tcs.SetResult(resp);
                         } else
                         {
-                            tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No image captured"));
+                            tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No image captured"));
                         }
 
                         _reader.CancelCapture();
@@ -179,12 +176,12 @@ namespace DSS.UareU.Web.Api.Client.Services
                 }
                 else
                 {
-                    tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, opened.ToString()));
+                    tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, opened.ToString()));
                 }
             } else
             {
                 _reader.Dispose();
-                tcs.SetResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader"));
+                tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader"));
             }
 
             return tcs.Task;
@@ -218,30 +215,6 @@ namespace DSS.UareU.Web.Api.Client.Services
 
         }
 
-        private Bitmap CreateBitmap(byte[] bytes, int width, int height)
-        {
-            byte[] rgbBytes = new byte[bytes.Length * 3];
-
-            for (int i = 0; i <= bytes.Length - 1; i++)
-            {
-                rgbBytes[(i * 3)] = bytes[i];
-                rgbBytes[(i * 3) + 1] = bytes[i];
-                rgbBytes[(i * 3) + 2] = bytes[i];
-            }
-            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-
-            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
-
-            for (int i = 0; i <= bmp.Height - 1; i++)
-            {
-                IntPtr p = new IntPtr(data.Scan0.ToInt64() + data.Stride * i);
-                System.Runtime.InteropServices.Marshal.Copy(rgbBytes, i * bmp.Width * 3, p, bmp.Width * 3);
-            }
-
-            bmp.UnlockBits(data);
-
-            return bmp;
-        }
 
     }
 }
