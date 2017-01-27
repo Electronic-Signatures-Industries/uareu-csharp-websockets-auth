@@ -46,7 +46,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers
                 {
                     { "account", model.Id },
                     { "email", model.Email },
-                    { "exp", DateTime.Now.AddHours(12).ToBinary() }
+                    { "exp", DateTime.UtcNow.AddHours(12).ToBinary() }
                 };
 
 
@@ -58,11 +58,11 @@ namespace DSS.UareU.Web.Api.Service.Controllers
                 return "OK";
             };
 
-            Get["/v1/device_info", true] = async (parameters, ct) =>
-            {
-                ReaderService service = new ReaderService();
-                return await service.GetReaderInfo();
-            };
+            //Get["/v1/device_info", true] = async (parameters, ct) =>
+            //{
+            //    ReaderService service = new ReaderService();
+            //    return await service.GetReaderInfo();
+            //};
 
         }
     }

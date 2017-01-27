@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace DPUruNet
 {
-    class WSQ
+    public class WSQ
     {
         #region PRIVATE COMPRESSION IMPORTS - dpfj.h and compression.h
         //Call this to intialize the compression library.

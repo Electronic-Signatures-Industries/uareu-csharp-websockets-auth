@@ -1,6 +1,5 @@
-﻿using DSS.UareU.Web.Api.Service.Mediatypes;
-using DSS.UareU.Web.Api.Service.Properties;
-using DSS.UareU.Web.Api.Service.Services;
+﻿using DSS.UareU.Web.Api.Shared.Mediatypes;
+using DSS.UareU.Web.Api.Client.Properties;
 using Nancy;
 using Nancy.Json;
 using Nancy.ModelBinding;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Service.Controllers.V1
+namespace DSS.UareU.Web.Api.Client.Controllers.V1
 {
     public class ClientMessagingModule : NancyModule
     {

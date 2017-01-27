@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServiceHost
+namespace ClientHost
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var url = "http://localhost:8080";
+            var url = "http://localhost:8088";
 
             using (WebApp.Start<Startup>(url))
             {

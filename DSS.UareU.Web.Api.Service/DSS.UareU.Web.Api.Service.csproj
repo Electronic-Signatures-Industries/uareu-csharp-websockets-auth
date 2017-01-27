@@ -94,22 +94,11 @@
   <ItemGroup>
     <Compile Include="ApiBootstrap.cs" />
     <Compile Include="Controllers\ApiModule.cs" />
-    <Compile Include="Controllers\V1\ClientMessagingModule.cs" />
     <Compile Include="Controllers\V1\CaptureModule.cs" />
-    <Compile Include="Controllers\V1\EnrollmentModule.cs" />
     <Compile Include="Controllers\V1\IdentifyModule.cs" />
     <Compile Include="DBClient.cs" />
-    <Compile Include="Extras\Encryption.cs" />
-    <Compile Include="Extras\NFIQ.cs" />
-    <Compile Include="Extras\WSQ.cs" />
-    <Compile Include="Mediatypes\ComparisonRequestMediaType.cs" />
-    <Compile Include="Mediatypes\CaptureResponseMediaType.cs" />
-    <Compile Include="Mediatypes\ComparisonResponseMediaType.cs" />
-    <Compile Include="Mediatypes\FindCaptureOptions.cs" />
     <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\ApiUser.cs" />
     <Compile Include="Models\FingerCapture.cs" />
-    <Compile Include="Models\JwtToken.cs" />
     <Compile Include="Models\RegisterModels.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -118,13 +107,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Services\BaseService.cs" />
-    <Compile Include="Services\ReaderService.cs" />
-    <Compile Include="Services\EnrollmentService.cs" />
+    <Compile Include="Services\CaptureService.cs" />
     <Compile Include="Services\ComparisonService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Controllers\V1\ClientMessagingWrapper.html" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -134,6 +118,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\DSS.UareU.Web.Api.Shared\DSS.UareU.Web.Api.Shared.csproj">
+      <Project>{70d36d24-c39e-4f8e-b8b5-301a74e7a58d}</Project>
+      <Name>DSS.UareU.Web.Api.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

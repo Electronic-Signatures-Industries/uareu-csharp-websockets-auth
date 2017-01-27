@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Service.Models
+namespace DSS.UareU.Web.Api.Shared
 {
     public class JwtToken
     {

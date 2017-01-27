@@ -1,6 +1,6 @@
 ﻿using DPUruNet;
-using DSS.UareU.Web.Api.Service.Extras;
-using DSS.UareU.Web.Api.Service.Mediatypes;
+using DSS.UareU.Web.Api.Shared;
+using DSS.UareU.Web.Api.Shared.Mediatypes;
 using DSS.UareU.Web.Api.Service.Models;
 using MongoDB.Driver;
 using System;

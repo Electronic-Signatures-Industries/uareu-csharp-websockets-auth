@@ -1,4 +1,4 @@
-﻿using DSS.UareU.Web.Api.Service.Mediatypes;
+﻿using DSS.UareU.Web.Api.Shared.Mediatypes;
 using DSS.UareU.Web.Api.Service.Services;
 using Nancy;
 using Nancy.Json;

@@ -1,6 +1,5 @@
-﻿using DSS.UareU.Web.Api.Service.Models;
+﻿using DSS.UareU.Web.Api.Client.Services;
 using DSS.UareU.Web.Api.Shared;
-using MongoDB.Driver;
 using Nancy.Authentication.Stateless;
 using Nancy.Bootstrapper;
 using Newtonsoft.Json;
@@ -13,17 +12,12 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Service
+namespace DSS.UareU.Web.Api.Client
 {
     public class ApiBootstrap : IApplicationStartup
     {
         public void Initialize(IPipelines pipelines)
         {
-            var cs = ConfigurationManager.AppSettings["DbConnectionString"];
-            var dbname = ConfigurationManager.AppSettings["DbName"];
-            RegisterModels.Bind();
-            DBClient.Instance = new MongoClient(cs);
-            DBClient.Database = DBClient.Instance.GetDatabase(dbname);
 
             pipelines.AfterRequest += ctx =>
             {
@@ -36,7 +30,17 @@ namespace DSS.UareU.Web.Api.Service
             var secret = ConfigurationManager.AppSettings["TokenSecret"];
             var statelessAuthConfiguration = new StatelessAuthenticationConfiguration(ctx =>
             {
-                var jwtToken = ctx.Request.Headers.Authorization.Replace("Bearer ", "");
+                var jwtToken = "";
+                if (ctx.Request.Query["s"] ==  null) {
+                    jwtToken = ctx.Request.Headers.Authorization.Replace("Bearer ", "");
+                } else
+                {
+                    var key = ctx.Request.Query["s"];
+                    if (ShortSecureTokens.Items[key] != null)
+                    {
+                        jwtToken = ShortSecureTokens.Items[key];
+                    }
+                }
 
                 try
                 {

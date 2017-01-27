@@ -1,11 +1,12 @@
 ﻿using DPUruNet;
-using DSS.UareU.Web.Api.Service.Extras;
-using DSS.UareU.Web.Api.Service.Mediatypes;
-using DSS.UareU.Web.Api.Service.Models;
-using MongoDB.Driver;
+using DSS.UareU.Web.Api.Client.Models;
+using DSS.UareU.Web.Api.Shared;
+using DSS.UareU.Web.Api.Shared.Mediatypes;
+using Jose;
 using Nancy.Responses;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -15,13 +16,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Service.Services
+namespace DSS.UareU.Web.Api.Client.Services
 {
     public class ReaderService : BaseService
     {
         CacheItemPolicy CACHE_POLICY = new CacheItemPolicy
         {
-            AbsoluteExpiration = DateTime.Now.AddHours(2)
+            AbsoluteExpiration = DateTime.Now.AddHours(1)
         };
         Reader _reader;
         static MemoryCache _cache = new MemoryCache("dss-a2f-fp");
@@ -34,7 +35,26 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
         }
 
-        private string SaveCapture(bool useCache, CaptureResult capture, Fid.Fiv imageView)
+        private string GetSecureToken(string username, string id)
+        {
+            var secretKey = ConfigurationManager.AppSettings["TokenSecret"];
+            var payload = new Dictionary<string, object>()
+                {
+                    { "account", id },
+                    { "email", username },
+                    { "exp", DateTime.UtcNow.AddHours(1).ToBinary() }
+                };
+
+
+
+            var s = Jose.JWT.Encode(payload, Encoding.UTF8.GetBytes(secretKey), JwsAlgorithm.HS256);
+            var token = Guid.NewGuid().ToString();
+            ShortSecureTokens.Items.Add(token, s, this.CACHE_POLICY);
+
+            return token;
+        }
+
+        private string SaveCapture(CaptureResult capture, Fid.Fiv imageView)
         {
             // FMD
             var fmd = CreateFMD(capture);
@@ -56,24 +76,16 @@ namespace DSS.UareU.Web.Api.Service.Services
 
             var model = new FingerCapture
             {
-                FMD = Encryption.Encrypt(fmd.Bytes),
-                Image = Encryption.Encrypt(stream.ToArray()),
+                FMD = fmd.Bytes,
+                Image = stream.ToArray(),
                 WSQImage = compressedData,
             };
             stream.Close();
 
-            if (useCache)
-            {
-                var id = Guid.NewGuid().ToString();
-                _cache.Add(id, model, CACHE_POLICY);
-                return id;
-            }
-            else
-            {
-                var coll = FingerCapture.GetCollection();
-                coll.InsertOne(model);
-                return model.Id;
-            }
+            var id = Guid.NewGuid().ToString();
+            _cache.Add(id, model, CACHE_POLICY);
+            return id;
+
         }
 
         private Fmd CreateFMD(CaptureResult capture)
@@ -95,12 +107,7 @@ namespace DSS.UareU.Web.Api.Service.Services
         public Task GetCaptureImageAsync(string id, FindCaptureOptions options)
         {
             FingerCapture model = null;
-            if (_cache[id] == null)
-            {
-                var filter = Builders<FingerCapture>.Filter.Where(i => i.Id == id);
-                var coll = FingerCapture.GetCollection();
-                model = coll.Find(filter).FirstOrDefault();
-            } else
+            if (_cache[id] != null)
             {
                 model = (FingerCapture)_cache[id];
             }
@@ -109,9 +116,6 @@ namespace DSS.UareU.Web.Api.Service.Services
             {
                 return Task.FromResult(BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
-
-            // decrypt
-            var image = Encryption.Decrypt(model.Image);
 
             MemoryStream stream = new MemoryStream();
 
@@ -124,7 +128,7 @@ namespace DSS.UareU.Web.Api.Service.Services
             }
             else
             {
-                stream.Write(image, 0, image.Length);
+                stream.Write(model.Image, 0, model.Image.Length);
                 stream.Position = 0;
                 var resp = new StreamResponse(() => stream, Nancy.MimeTypes.GetMimeType(id + ".jpg"));
                 return Task.FromResult<Nancy.Response>(resp);
@@ -132,7 +136,7 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         }
 
-        public Task<Nancy.Response> CaptureAsync(bool useMemCache)
+        public Task<Nancy.Response> CaptureAsync(string username)
         {
             var readers = ReaderCollection.GetReaders();
             var tcs = new TaskCompletionSource<Nancy.Response>();
@@ -157,9 +161,10 @@ namespace DSS.UareU.Web.Api.Service.Services
                         Console.WriteLine("Captured");
                         var view = res.Data.Views.FirstOrDefault();
                         if (view != null) {                            
-                            var id = SaveCapture(useMemCache, res, view);
+                            var id = SaveCapture(res, view);
+                            var token = GetSecureToken(username, id);
                             // send as Location, 201
-                            var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);
+                            var resp = BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id + "?s=" + token);
                             // send nancy resp
                             tcs.SetResult(resp);
                         } else

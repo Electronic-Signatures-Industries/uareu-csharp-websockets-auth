@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Service.Services
+namespace DSS.UareU.Web.Api.Client.Services
 {
     public class BaseService
     {

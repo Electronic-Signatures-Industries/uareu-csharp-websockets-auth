@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Service.Extras
+namespace DSS.UareU.Web.Api.Shared
 {
     public class Encryption
     {
