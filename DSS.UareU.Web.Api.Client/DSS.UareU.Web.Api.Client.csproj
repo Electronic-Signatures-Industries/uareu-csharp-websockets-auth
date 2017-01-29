@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiBootstrap.cs" />
+    <Compile Include="Controllers\V1\CaptureWebSocketController.cs" />
+    <Compile Include="Controllers\V1\PingWebSocketController.cs" />
     <Compile Include="Controllers\V1\ApiModule.cs" />
     <Compile Include="Controllers\V1\CaptureModule.cs" />
     <Compile Include="Controllers\V1\ClientMessagingModule.cs" />
@@ -90,6 +92,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DSS.UareU.Web.Api.Shared\DSS.UareU.Web.Api.Shared.csproj">
