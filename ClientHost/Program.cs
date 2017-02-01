@@ -1,8 +1,11 @@
-﻿using DSS.UareU.Web.Api.Client.Controllers.V1;
+﻿using ClientHost.Properties;
+using DSS.UareU.Web.Api.Client.Controllers.V1;
 using Microsoft.Owin.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using WebSocketSharp.Server;
@@ -13,10 +16,14 @@ namespace ClientHost
     {
         static void Main(string[] args)
         {
-            var wssv = new WebSocketServer("ws://localhost:8881");
+            string wsPort = ConfigurationManager.AppSettings["auth2factor.Websocket.Port"];
+            var wssv = new WebSocketServer(Int32.Parse(wsPort), true);
+            wssv.SslConfiguration.ServerCertificate = new X509Certificate2(Resources.certificate, "a2f");
             wssv.AddWebSocketService<PingWebSocketController>("/ping");
             wssv.Start();
-            var url = "http://localhost:8088";
+
+            string webPort = ConfigurationManager.AppSettings["auth2factor.REST.Port"];
+            var url = "http://localhost:" + webPort;
 
             using (WebApp.Start<Startup>(url))
             {
