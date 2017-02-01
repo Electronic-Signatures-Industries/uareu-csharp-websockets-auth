@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.LicenseEngine.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.LicenseConsole", "DSS.UareU.Web.Api.LicenseConsole\DSS.UareU.Web.Api.LicenseConsole.csproj", "{5B97E946-3615-466D-B86F-D7A074C50D09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.License.Shared", "DSS.UareU.Web.Api.License.Shared\DSS.UareU.Web.Api.License.Shared.csproj", "{A89592DF-5232-4EF7-8C7A-EEA648206C0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{5B97E946-3615-466D-B86F-D7A074C50D09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B97E946-3615-466D-B86F-D7A074C50D09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B97E946-3615-466D-B86F-D7A074C50D09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A89592DF-5232-4EF7-8C7A-EEA648206C0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A89592DF-5232-4EF7-8C7A-EEA648206C0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A89592DF-5232-4EF7-8C7A-EEA648206C0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A89592DF-5232-4EF7-8C7A-EEA648206C0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

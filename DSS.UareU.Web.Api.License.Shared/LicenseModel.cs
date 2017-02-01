@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.LicenseConsole
+namespace DSS.UareU.Web.Api.License.Shared
 {
     public class LicenseModel
     {
