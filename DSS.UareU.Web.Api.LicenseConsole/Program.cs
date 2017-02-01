@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace DSS.UareU.Web.Api.LicenseConsole
 {
+    // -n "Demo App" -e auth2factor -a http://localhost:8080/ http://localhost:8088/
     class Program
     {
         static void Main(string[] args)
@@ -32,9 +34,19 @@ namespace DSS.UareU.Web.Api.LicenseConsole
 
             if (result.HasErrors == false)
             {
-                var lic = JsonConvert.SerializeObject(LicenseModel.FromArgs(p.Object));
+                var model = LicenseModel.FromArgs(p.Object);
+                var lic = JsonConvert.SerializeObject(model);
                 LicenseService signer = new LicenseService();
                 var signature = signer.Sign(Resources.a2f_fp_key_pvk, lic);
+                model.l = signature;
+
+                StreamWriter writer = new StreamWriter("license.json", false, Encoding.UTF8);
+                lic = JsonConvert.SerializeObject(model);
+                writer.Write(lic);
+                writer.Close();
+
+                Console.WriteLine("Created license.json");
+                
             }
         }
     }

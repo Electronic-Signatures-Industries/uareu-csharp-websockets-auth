@@ -13,7 +13,8 @@ namespace DSS.UareU.Web.Api.LicenseConsole
         public string Name { get; set; }
         public string Entity { get; set; }
         public List<string> AllowedApps { get; set; }
-        public string ApiServerKey { get; set; }
+        public string ApiServerSecret { get; set; }
+        public string  ApiClientSecret { get; set; }
         public DateTime Created { get; set; }
         public string l { get; set; }
 
@@ -23,10 +24,13 @@ namespace DSS.UareU.Web.Api.LicenseConsole
             model.Created = DateTime.Now;
 
             var rng = new CryptoRandom();
-            using (SHA256 hash = SHA256Managed.Create())
+            using (SHA512 hash = SHA512Managed.Create())
             {
-                byte[] result = hash.ComputeHash(rng.NextBytes(128));
-                model.ApiServerKey = Convert.ToBase64String(result);
+                byte[] result = hash.ComputeHash(rng.NextBytes(256));
+                model.ApiServerSecret = Convert.ToBase64String(result);
+
+                result = hash.ComputeHash(rng.NextBytes(256));
+                model.ApiClientSecret = Convert.ToBase64String(result);
             }
 
             return model;
