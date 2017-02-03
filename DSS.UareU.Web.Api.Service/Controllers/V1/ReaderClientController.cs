@@ -30,6 +30,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
         protected override void OnMessage(MessageEventArgs e)
         {
+
             if (e.IsText)
             {
                 if (e.Data == "REGISTER_DEVICE")
@@ -43,6 +44,12 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                     StateCheck = payload.StateCheck,
                     Data = payload.Data,
                 };
+
+                var sid = string.Empty;
+                if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value != null)
+                {
+                    sid = RequestSubscribers[payload.StateCheck];
+                }
                 switch (payload.Type)
                 {
                     case "device_info":
@@ -55,7 +62,6 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         break;
 
                     case "device_info_reply":
-                        var sid = RequestSubscribers[payload.StateCheck];
                         if (sid != null)
                         {
                             RequestSubscribers.Remove(payload.StateCheck);
@@ -65,11 +71,32 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         break;
 
                     case "capture_image":
-                        this.Sessions.Broadcast(JsonConvert.SerializeObject(request));
+                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
+                        {
+                            RequestSubscribers.Add(payload.StateCheck, this.ID);
+                        }
+                        request.Type = payload.Type + "_request";
+
+                        SendToDevices(request);
+                        break;
+
+                    case "capture_image_reply":
+                        if (sid != null)
+                        {
+                            RequestSubscribers.Remove(payload.StateCheck);
+                            request.Type = "capture_image_response";
+                            this.Sessions.SendTo(JsonConvert.SerializeObject(request), sid);
+                        }
                         break;
 
                     case "capture_extended":
-                        this.Sessions.Broadcast(JsonConvert.SerializeObject(request));
+                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
+                        {
+                            RequestSubscribers.Add(payload.StateCheck, this.ID);
+                        }
+                        request.Type = payload.Type + "_request";
+
+                        SendToDevices(request);
                         break;
 
                 }

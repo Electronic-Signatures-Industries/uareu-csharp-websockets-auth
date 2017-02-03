@@ -26,7 +26,9 @@ namespace DSS.UareU.Web.Api.Client.Services
         };
         Reader _reader;
         static MemoryCache _cache = new MemoryCache("dss-a2f-fp");
-        
+        public string CurrentCaptureID { get; set; }
+        public FingerCapture CurrentCaptureModel { get; set; }
+
         public void Close()
         {
             if (this._reader != null)
@@ -114,6 +116,7 @@ namespace DSS.UareU.Web.Api.Client.Services
                 return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
 
+            this.CurrentCaptureModel = model;
             MemoryStream stream = new MemoryStream();
 
             if (options.Extended)
@@ -159,6 +162,7 @@ namespace DSS.UareU.Web.Api.Client.Services
                         var view = res.Data.Views.FirstOrDefault();
                         if (view != null) {                            
                             var id = SaveCapture(res, view);
+                            this.CurrentCaptureID = id;
                             // var token = GetSecureToken(username, id);
                             // send as Location, 201
                             var resp = ResponseMessageBuilder.BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + id);

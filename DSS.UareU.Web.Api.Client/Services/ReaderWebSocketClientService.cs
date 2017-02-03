@@ -13,6 +13,7 @@ namespace DSS.UareU.Web.Api.Client.Services
     {
         private WebSocket client { get; set; }
         ReaderService reader = new ReaderService();
+        const int TIMEOUT_SECONDS = 15;
 
         public ReaderWebSocketClientService()
         {
@@ -47,6 +48,34 @@ namespace DSS.UareU.Web.Api.Client.Services
                         var info = await reader.GetReaderInfo();
                         request.Data = JsonConvert.SerializeObject(info);
                         this.client.Send(JsonConvert.SerializeObject(request));
+                        break;
+
+                    case "capture_image_request":
+                        request.Type = "device_info_reply";
+                        var captureTask = reader.CaptureAsync("mol@killa");
+
+                        if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000)))
+                        {
+                            await captureTask;
+                            await reader.GetCaptureImageAsync(this.reader.CurrentCaptureID, new FindCaptureOptions
+                            {
+                                Extended = false,
+                            });
+                            request.Data = JsonConvert.SerializeObject(new {
+                                ID = reader.CurrentCaptureID,
+                                Image = Convert.ToBase64String(this.reader.CurrentCaptureModel.Image),
+                            });
+                        }
+                        else
+                        {
+                            reader.Close();
+                            request.Data = JsonConvert.SerializeObject(new { Message = "Timeout after 15 seconds" });
+                        }
+
+
+
+                        this.client.Send(JsonConvert.SerializeObject(request));
+
                         break;
 
                 }
