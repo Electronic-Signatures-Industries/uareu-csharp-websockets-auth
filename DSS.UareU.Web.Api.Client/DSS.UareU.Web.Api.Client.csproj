@@ -47,7 +47,6 @@
     <Compile Include="Controllers\V1\PingWebSocketController.cs" />
     <Compile Include="Controllers\V1\ApiModule.cs" />
     <Compile Include="Controllers\V1\CaptureModule.cs" />
-    <Compile Include="Controllers\V1\ClientMessagingModule.cs" />
     <Compile Include="Models\FingerCapture.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -55,9 +54,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\ReaderService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Controllers\V1\ClientMessagingWrapper.html" />
+    <Compile Include="Services\ReaderWebSocketClientService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -1,5 +1,6 @@
 ﻿using ClientHost.Properties;
 using DSS.UareU.Web.Api.Client.Controllers.V1;
+using DSS.UareU.Web.Api.Client.Services;
 using Microsoft.Owin.Hosting;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,14 @@ namespace ClientHost
     {
         static void Main(string[] args)
         {
-            string wsPort = ConfigurationManager.AppSettings["auth2factor.Websocket.Port"];
-            var wssv = new WebSocketServer(Int32.Parse(wsPort), true);
-            wssv.SslConfiguration.ServerCertificate = new X509Certificate2(Resources.certificate, "a2f");
-            wssv.AddWebSocketService<PingWebSocketController>("/ping");
-            wssv.Start();
+            //string wsPort = ConfigurationManager.AppSettings["auth2factor.Websocket.Port"];
+            //var wssv = new WebSocketServer(Int32.Parse(wsPort), true);
+            //wssv.SslConfiguration.ServerCertificate = new X509Certificate2(Resources.certificate, "a2f");
+            //wssv.AddWebSocketService<PingWebSocketController>("/ping");
+            //wssv.Start();
+
+            ReaderWebSocketClientService client = new ReaderWebSocketClientService();
+            client.Start();
 
             string webPort = ConfigurationManager.AppSettings["auth2factor.REST.Port"];
             var url = "http://localhost:" + webPort;
@@ -30,6 +34,7 @@ namespace ClientHost
                 Console.WriteLine("Running on {0}", url);
                 Console.WriteLine("Press enter to exit");
                 Console.ReadLine();
+                client.Close();
             }
         }
     }

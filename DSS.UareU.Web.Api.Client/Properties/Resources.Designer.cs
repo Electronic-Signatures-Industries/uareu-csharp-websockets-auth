@@ -59,29 +59,5 @@ namespace DSS.UareU.Web.Api.Client.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///
-        ///&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
-        ///&lt;head&gt;
-        ///    &lt;meta charset=&quot;utf-8&quot; /&gt;
-        ///    &lt;title&gt;auth2factor fingerprint client messaging wrapper&lt;/title&gt;
-        ///    &lt;script src=&quot;https://unpkg.com/axios/dist/axios.min.js&quot;&gt;&lt;/script&gt;
-        ///    &lt;script&gt;
-        ///
-        ///        function receiveMessage(event) {
-        ///            // Do we trust the sender of this message?
-        ///            if (event.origin !== &quot;http://localhost:8081&quot;)
-        ///                return;
-        ///
-        ///            // { name, args }
-        ///            if (event.data.na [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string ClientMessagingWrapper {
-            get {
-                return ResourceManager.GetString("ClientMessagingWrapper", resourceCulture);
-            }
-        }
     }
 }
