@@ -106,7 +106,7 @@ namespace DSS.UareU.Web.Api.Client.Services
         public Task GetCaptureImageAsync(string id, FindCaptureOptions options)
         {
             FingerCapture model = null;
-            if (_cache[id] != null)
+            if (_cache.FirstOrDefault(i => i.Key == id).Value != null)
             {
                 model = (FingerCapture)_cache[id];
             }
@@ -184,8 +184,11 @@ namespace DSS.UareU.Web.Api.Client.Services
                 }
             } else
             {
-                _reader.Dispose();
-                tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader"));
+                if (_reader != null)
+                {
+                    _reader.Dispose();
+                }
+                tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader found"));
             }
 
             return tcs.Task;
@@ -199,7 +202,7 @@ namespace DSS.UareU.Web.Api.Client.Services
             if (readers.Count > 0)
             {
                 var reader = readers.FirstOrDefault();
-                if (reader.Open(Constants.CapturePriority.DP_PRIORITY_COOPERATIVE) == Constants.ResultCode.DP_SUCCESS)
+                if (reader.Open(Constants.CapturePriority.DP_PRIORITY_EXCLUSIVE) == Constants.ResultCode.DP_SUCCESS)
                 {
                     tcs.SetResult(reader.Description);
                 }

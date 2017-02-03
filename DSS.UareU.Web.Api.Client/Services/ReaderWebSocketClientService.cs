@@ -45,13 +45,23 @@ namespace DSS.UareU.Web.Api.Client.Services
                 {
                     case "device_info_request":
                         request.Type = "device_info_reply";
-                        var info = await reader.GetReaderInfo();
-                        request.Data = JsonConvert.SerializeObject(info);
+
+                        try
+                        {
+                            var info = await reader.GetReaderInfo();
+                            request.Data = JsonConvert.SerializeObject(info);
+                        }
+                        catch
+                        {
+                            request.Data = JsonConvert.SerializeObject(new { Message = "No device found" });
+                        }
+
                         this.client.Send(JsonConvert.SerializeObject(request));
+
                         break;
 
                     case "capture_image_request":
-                        request.Type = "device_info_reply";
+                        request.Type = "capture_image_reply";
                         var captureTask = reader.CaptureAsync("mol@killa");
 
                         if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000)))
@@ -61,10 +71,23 @@ namespace DSS.UareU.Web.Api.Client.Services
                             {
                                 Extended = false,
                             });
-                            request.Data = JsonConvert.SerializeObject(new {
-                                ID = reader.CurrentCaptureID,
-                                Image = Convert.ToBase64String(this.reader.CurrentCaptureModel.Image),
-                            });
+
+                            if (this.reader.CurrentCaptureModel == null)
+                            {
+                                reader.Close();
+                                request.Data = JsonConvert.SerializeObject(new { Message = "No reader found" });
+                            }
+                            else
+                            {
+                                request.Data = JsonConvert.SerializeObject(new
+                                {
+                                    ID = reader.CurrentCaptureID,
+                                    Image = this.reader.CurrentCaptureModel.Image,
+                                    FMD = this.reader.CurrentCaptureModel.FMD,
+                                    WSQ = this.reader.CurrentCaptureModel.WSQImage,
+                                    ContentType = "image/jpg",
+                                });
+                            }
                         }
                         else
                         {

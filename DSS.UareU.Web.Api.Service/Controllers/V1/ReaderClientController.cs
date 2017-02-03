@@ -89,15 +89,6 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         }
                         break;
 
-                    case "capture_extended":
-                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
-                        {
-                            RequestSubscribers.Add(payload.StateCheck, this.ID);
-                        }
-                        request.Type = payload.Type + "_request";
-
-                        SendToDevices(request);
-                        break;
 
                 }
             }
