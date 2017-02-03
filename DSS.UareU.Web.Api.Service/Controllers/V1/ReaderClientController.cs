@@ -1,4 +1,5 @@
-﻿using DSS.UareU.Web.Api.Shared.Mediatypes;
+﻿using DSS.UareU.Web.Api.Service.Services;
+using DSS.UareU.Web.Api.Shared.Mediatypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,9 +16,12 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
     {
         static Dictionary<string, string> RequestSubscribers = new Dictionary<string, string>();
         static Dictionary<string, string> DevicesSubscribers = new Dictionary<string, string>();
+        WebSocketSecureTokenService AuthService { get; set; }
 
         public ReaderClientController()
         {
+            AuthService = new WebSocketSecureTokenService();
+            AuthService.BindLicense();
         }
 
         void SendToDevices(ReaderClientRequestMediaType request)
@@ -27,6 +31,31 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                 this.Sessions.SendTo(JsonConvert.SerializeObject(request), id);
             }
         }
+
+        void RequiresAuthentication(string type, ReaderClientRequestMediaType request, out bool exit)
+        {
+            exit = false;
+            if (!AuthService.IsAuthenticated)
+            {
+                request.Type = type;
+                request.Data = JsonConvert.SerializeObject(new { Message = "Invalid token or expired" });
+                this.Send(JsonConvert.SerializeObject(request));
+                exit = true;
+            }
+        }
+
+        void RequiresOriginCheck(string type, ReaderClientRequestMediaType request, out bool exit)
+        {
+            exit = false;
+            if (!AuthService.IsValidOrigin(this.Context.Origin))
+            {
+                request.Type = type;
+                request.Data = JsonConvert.SerializeObject(new { Message = "Invalid origin, check license allowed app origins" });
+                this.Send(JsonConvert.SerializeObject(request));
+                exit = true;
+            }
+        }
+
 
         protected override void OnMessage(MessageEventArgs e)
         {
@@ -39,12 +68,14 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                     return;
                 }
                 var payload = JsonConvert.DeserializeObject<ReaderClientRequestMediaType>(e.Data);
+                AuthService.BindToken(payload.BearerToken);
+
                 var request = new ReaderClientRequestMediaType
                 {
                     StateCheck = payload.StateCheck,
                     Data = payload.Data,
                 };
-
+                bool exit = false;
                 var sid = string.Empty;
                 if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value != null)
                 {
@@ -53,6 +84,12 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                 switch (payload.Type)
                 {
                     case "device_info":
+                        this.RequiresOriginCheck(payload.Type, request, out exit);
+                        if (exit) return;
+
+                        this.RequiresAuthentication(payload.Type, request, out exit);
+                        if (exit) return;
+
                         if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null) {
                             RequestSubscribers.Add(payload.StateCheck, this.ID);
                         }
@@ -71,6 +108,12 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         break;
 
                     case "capture_image":
+                        this.RequiresOriginCheck(payload.Type, request, out exit);
+                        if (exit) return;
+
+                        this.RequiresAuthentication(payload.Type, request, out exit);
+                        if (exit) return;
+
                         if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
                         {
                             RequestSubscribers.Add(payload.StateCheck, this.ID);

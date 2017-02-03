@@ -1,0 +1,100 @@
+﻿using DSS.LicenseEngine;
+using DSS.UareU.Web.Api.License.Shared;
+using DSS.UareU.Web.Api.Service.Properties;
+using DSS.UareU.Web.Api.Shared;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DSS.UareU.Web.Api.Service.Services
+{
+    public class WebSocketSecureTokenService
+    {
+        public bool IsAuthenticated { get; set; }
+
+        LicenseModel License { get; set; }
+
+        public WebSocketSecureTokenService()
+        {
+
+        }
+
+        public void BindLicense()
+        {
+            var license = "license.json";
+            if (!File.Exists(license))
+            {
+                Console.WriteLine("Missing license.json");
+                return;
+            }
+
+            try
+            {
+
+                var temp = new LicenseModel();
+                using (StreamReader reader = new StreamReader(license))
+                {
+                    var text = reader.ReadToEnd();
+                    var model = JsonConvert.DeserializeObject<LicenseModel>(text);
+                    this.License = model;
+                    temp = new LicenseModel
+                    {
+                        AllowedApps = model.AllowedApps,
+                        ApiClientSecret = model.ApiClientSecret,
+                        ApiServerSecret = model.ApiServerSecret,
+                        Created = model.Created,
+                        Entity = model.Entity,
+                        Name = model.Name,
+                    };
+                }
+                var unsignedLic = JsonConvert.SerializeObject(temp);
+                LicenseService verifier = new LicenseService();
+                bool isValid = verifier.Verify(Resources.a2f_fp_key_pub, this.License.l, unsignedLic);
+                if (!isValid)
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while reading license.json");
+                return;
+            }
+        }
+
+        public void BindToken(string token)
+        {
+            try
+            {
+                var payloadJSON = Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(this.License.ApiServerSecret));
+                var payload = JsonConvert.DeserializeObject<JwtToken>(payloadJSON);
+                var tokenExpires = DateTime.FromBinary(payload.exp);
+
+                if (tokenExpires > DateTime.UtcNow)
+                {
+                    this.IsAuthenticated = true;
+                }
+                else
+                {
+                    this.IsAuthenticated = false;
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                this.IsAuthenticated = false;
+            }
+        }
+
+
+        public bool IsValidOrigin(string origin)
+        {
+            return this.License.AllowedApps.Where(i => i.IndexOf(origin) > -1).Count() > 0;
+        }
+    }
+}

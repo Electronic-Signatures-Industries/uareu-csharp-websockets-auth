@@ -114,9 +114,11 @@
     </Compile>
     <Compile Include="Services\CaptureService.cs" />
     <Compile Include="Services\ComparisonService.cs" />
+    <Compile Include="Services\WebSocketSecureTokenService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\a2f_fp_key_pub" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

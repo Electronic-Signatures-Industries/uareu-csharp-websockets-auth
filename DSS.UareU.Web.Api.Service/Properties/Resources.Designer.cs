@@ -59,5 +59,15 @@ namespace DSS.UareU.Web.Api.Service.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] a2f_fp_key_pub {
+            get {
+                object obj = ResourceManager.GetObject("a2f_fp_key_pub", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }
