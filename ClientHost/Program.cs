@@ -24,7 +24,7 @@ namespace ClientHost
             //wssv.Start();
 
             ReaderWebSocketClientService client = new ReaderWebSocketClientService();
-            client.Start();
+            client.Start("cliente");
 
             string webPort = ConfigurationManager.AppSettings["auth2factor.REST.Port"];
             var url = "http://localhost:" + webPort;

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="ApiUser.cs" />
     <Compile Include="BitmapConverter.cs" />
+    <Compile Include="Mediatypes\FingerCaptureClient.cs" />
     <Compile Include="Mediatypes\ReaderClientRequestMediaType.cs" />
     <Compile Include="ResponseMessageExtension.cs" />
     <Compile Include="Encryption.cs" />

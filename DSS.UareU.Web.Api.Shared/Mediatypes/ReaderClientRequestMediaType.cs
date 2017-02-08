@@ -10,6 +10,7 @@ namespace DSS.UareU.Web.Api.Shared.Mediatypes
     {
         public string BearerToken { get; set; }
         public string Type { get; set; }
+        public string ClientID { get; set; }
         public string StateCheck { get; set; }
         public string Data { get; set; }
     }

@@ -14,9 +14,11 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 {
     public class ReaderClientController : WebSocketBehavior
     {
+        static Dictionary<string, bool> OnPreReponseQueue = new Dictionary<string, bool>();
         static Dictionary<string, string> RequestSubscribers = new Dictionary<string, string>();
         static Dictionary<string, string> DevicesSubscribers = new Dictionary<string, string>();
         WebSocketSecureTokenService AuthService { get; set; }
+        CaptureService captureService = new CaptureService();
 
         public ReaderClientController()
         {
@@ -27,6 +29,22 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
         void SendToDevices(ReaderClientRequestMediaType request)
         {
             foreach (var id in this.Sessions.ActiveIDs.Where(i => DevicesSubscribers.FirstOrDefault(j => j.Key == i).Value != null))
+            {
+                this.Sessions.SendTo(JsonConvert.SerializeObject(request), id);
+            }
+        }
+
+        void SendToDevice(string clientId, ReaderClientRequestMediaType request)
+        {
+            if (DevicesSubscribers.Keys.FirstOrDefault(i => i == clientId ) == null)
+            {
+                request.Data = JsonConvert.SerializeObject(new { Message = "Invalid client id" });
+                this.Send(JsonConvert.SerializeObject(request));
+                return;
+            }
+
+            var id = DevicesSubscribers[clientId];
+            if (this.Sessions.ActiveIDs.Where(i => i == id).Count() > 0)
             {
                 this.Sessions.SendTo(JsonConvert.SerializeObject(request), id);
             }
@@ -62,9 +80,15 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
             if (e.IsText)
             {
-                if (e.Data == "REGISTER_DEVICE")
+                if (e.Data.IndexOf("REGISTER_DEVICE") > -1)
                 {
-                    DevicesSubscribers.Add(this.ID, this.ID);
+                    var id = e.Data.Split(':').ElementAtOrDefault(1);
+
+                    if (id == null)
+                    {
+                        throw new Exception("Missing register device name");
+                    }
+                    DevicesSubscribers.Add(id, this.ID);
                     return;
                 }
                 var payload = JsonConvert.DeserializeObject<ReaderClientRequestMediaType>(e.Data);
@@ -77,12 +101,24 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                 };
                 bool exit = false;
                 var sid = string.Empty;
+
                 if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value != null)
                 {
                     sid = RequestSubscribers[payload.StateCheck];
                 }
                 switch (payload.Type)
                 {
+                    case "device_subscribers":
+                        this.RequiresOriginCheck(payload.Type, request, out exit);
+                        if (exit) return;
+
+                        this.RequiresAuthentication(payload.Type, request, out exit);
+                        if (exit) return;
+                        
+                        request.Type = payload.Type + "_response";
+                        request.Data = JsonConvert.SerializeObject(new { devices = DevicesSubscribers.ToArray() });
+                        SendToDevice(this.ID, request);
+                        break;
                     case "device_info":
                         this.RequiresOriginCheck(payload.Type, request, out exit);
                         if (exit) return;
@@ -95,7 +131,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         }
                         request.Type = payload.Type + "_request";
 
-                        SendToDevices(request);
+                        SendToDevice(payload.ClientID, request);
                         break;
 
                     case "device_info_reply":
@@ -120,7 +156,23 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         }
                         request.Type = payload.Type + "_request";
 
-                        SendToDevices(request);
+                        if (payload.Data != null && payload.Data.Length > 0)
+                        {
+                            try
+                            {
+                                JObject options = JsonConvert.DeserializeObject(payload.Data) as JObject;
+                                bool store = options["store"].Value<bool>();
+                                if (store)
+                                {
+                                    OnPreReponseQueue.Add(payload.StateCheck, true);
+                                }
+                            }
+                            catch
+                            {
+                                // ignore
+                            }
+                        }
+                        SendToDevice(payload.ClientID, request);
                         break;
 
                     case "capture_image_reply":
@@ -128,6 +180,18 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         {
                             RequestSubscribers.Remove(payload.StateCheck);
                             request.Type = "capture_image_response";
+
+                            if (OnPreReponseQueue.Keys.FirstOrDefault(i => i == payload.StateCheck) != null)
+                            {
+                                OnPreReponseQueue.Remove(payload.StateCheck);
+                                var capture = JsonConvert.DeserializeObject<FingerCaptureClient>(request.Data);
+                                var model = captureService.SaveCapture(capture.FMD, capture.WSQ);
+                                capture.ID = model.Id;
+
+                                request.Data = JsonConvert.SerializeObject(capture);
+
+                            }
+
                             this.Sessions.SendTo(JsonConvert.SerializeObject(request), sid);
                         }
                         break;

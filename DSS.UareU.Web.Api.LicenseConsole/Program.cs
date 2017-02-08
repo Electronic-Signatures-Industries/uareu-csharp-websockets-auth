@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using DSS.UareU.Web.Api.License.Shared;
 
 namespace DSS.UareU.Web.Api.LicenseConsole
 {

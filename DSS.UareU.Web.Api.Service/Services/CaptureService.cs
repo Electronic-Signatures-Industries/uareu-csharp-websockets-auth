@@ -26,6 +26,18 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         public Task<Nancy.Response> SaveCaptureAsync(byte[] fmd, byte[] compressedImage)
         {
+            var model = SaveCapture(fmd, compressedImage);
+
+            if (model == null)
+            {
+                return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "Invalid data"));
+            } else
+            {
+                return Task.FromResult(ResponseMessageBuilder.BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + model.Id));
+            }
+        }
+        public FingerCapture SaveCapture(byte[] fmd, byte[] compressedImage)
+        {
             // Decompress the image
             byte[] uncompressedData = DPUruNet.WSQ.UnCompressNIST(compressedImage, WSQ.IMAGE_FORMAT.DPFJ_FID_ANSI_381_2004);
             
@@ -50,11 +62,11 @@ namespace DSS.UareU.Web.Api.Service.Services
 
                 var coll = FingerCapture.GetCollection();
                 coll.InsertOne(model);
-                return Task.FromResult(ResponseMessageBuilder.BuildLocationResponse(Nancy.HttpStatusCode.Created, "api/v1/capture/" + model.Id));
+                return model;
             }
             else
             {
-                return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "Invalid data"));
+                return null;
             }
         }
 

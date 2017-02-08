@@ -44,7 +44,7 @@ namespace DSS.UareU.Web.Api.Client.Controllers.V1
 
                 JsonSettings.MaxJsonLength = 50 * 10000;
 
-                var captureTask = service.CaptureAsync(this.Context.CurrentUser.UserName);
+                var captureTask = service.CaptureAsync();
 
                 if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000))) {
                     return await captureTask;

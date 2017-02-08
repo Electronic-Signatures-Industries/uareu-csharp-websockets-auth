@@ -43,8 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiBootstrap.cs" />
-    <Compile Include="Controllers\V1\CaptureWebSocketController.cs" />
-    <Compile Include="Controllers\V1\PingWebSocketController.cs" />
     <Compile Include="Controllers\V1\ApiModule.cs" />
     <Compile Include="Controllers\V1\CaptureModule.cs" />
     <Compile Include="Models\FingerCapture.cs" />

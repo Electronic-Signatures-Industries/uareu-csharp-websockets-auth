@@ -79,6 +79,11 @@ namespace DSS.UareU.Web.Api.Client.Services
                 Image = stream.ToArray(),
                 WSQImage = compressedData,
             };
+
+            //FileStream s = new FileStream(DateTime.Now.Ticks.ToString() + "-87132230-ri.wsq", FileMode.CreateNew);
+            //s.Write(compressedData, 0, compressedData.Length);
+            //s.Close();
+
             stream.Close();
 
             var id = Guid.NewGuid().ToString();
@@ -136,7 +141,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
         }
 
-        public Task<Nancy.Response> CaptureAsync(string username)
+        public Task<Nancy.Response> CaptureAsync()
         {
             var readers = ReaderCollection.GetReaders();
             var tcs = new TaskCompletionSource<Nancy.Response>();

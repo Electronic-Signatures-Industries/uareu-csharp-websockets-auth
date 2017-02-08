@@ -21,10 +21,10 @@ namespace DSS.UareU.Web.Api.Client.Services
             client.OnMessage += Client_OnMessage;
         }
 
-        public void Start()
+        public void Start(string name)
         {
             this.client.Connect();
-            this.client.Send("REGISTER_DEVICE");
+            this.client.Send("REGISTER_DEVICE:" + name);
         }
 
         public void Close()
@@ -62,7 +62,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
                     case "capture_image_request":
                         request.Type = "capture_image_reply";
-                        var captureTask = reader.CaptureAsync("mol@killa");
+                        var captureTask = reader.CaptureAsync();
 
                         if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000)))
                         {
@@ -79,9 +79,8 @@ namespace DSS.UareU.Web.Api.Client.Services
                             }
                             else
                             {
-                                request.Data = JsonConvert.SerializeObject(new
+                                request.Data = JsonConvert.SerializeObject(new FingerCaptureClient
                                 {
-                                    ID = reader.CurrentCaptureID,
                                     Image = this.reader.CurrentCaptureModel.Image,
                                     FMD = this.reader.CurrentCaptureModel.FMD,
                                     WSQ = this.reader.CurrentCaptureModel.WSQImage,
