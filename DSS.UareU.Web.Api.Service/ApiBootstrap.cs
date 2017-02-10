@@ -54,11 +54,11 @@ namespace DSS.UareU.Web.Api.Service
 
         public void Initialize(IPipelines pipelines)
         {
-            var license = "license.json";
+            var license = ConfigurationManager.AppSettings["LicensePath"];
+            license = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, license);
             if (!File.Exists(license))
             {
-                Console.WriteLine("Missing license.json");
-                return;
+                throw new Exception("Missing license.json");
             }
 
             try
@@ -72,8 +72,7 @@ namespace DSS.UareU.Web.Api.Service
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error while reading license.json");
-                return;
+                throw new Exception("Error while reading license.json");
             }
 
             var cs = ConfigurationManager.AppSettings["DbConnectionString"];

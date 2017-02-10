@@ -43,8 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiBootstrap.cs" />
-    <Compile Include="Controllers\V1\ApiModule.cs" />
-    <Compile Include="Controllers\V1\CaptureModule.cs" />
     <Compile Include="Models\FingerCapture.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -97,6 +95,9 @@
       <Project>{70d36d24-c39e-4f8e-b8b5-301a74e7a58d}</Project>
       <Name>DSS.UareU.Web.Api.Shared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

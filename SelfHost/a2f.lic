@@ -1,0 +1,9 @@
+﻿{
+  "Name": "Demo App",
+  "Entity": "auth2factor",
+  "AllowedApps": [ "http://localhost:8080/", "http://localhost:8088/", "http://localhost:8081/" ],
+  "ApiServerSecret": "XOqnK6OeVp49ePX5ghvqAoirlKXrLdbYnSSxbnCPYZc/WGJo9rMGJSSvoo7AaIXF7zI4AeD240o1zPTTL5Q2dg==",
+  "ApiClientSecret": "KFngQjinNtHWtyKqiXINcByuNEkqyoGkaX8xL+IXKfH5mUfBGApNkIv1supp7Pw45AS+FfjZiEXrLZ8prNf2ww==",
+  "Created": "2017-02-03T17:36:45.7455845-05:00",
+  "l": "gzs+psZ7cjVJO12uVdfSUwG/XMCQ340YMY4MGBRXS6JEagfKxhlPX/2YGmi0KdpNd75s03fXhfo0r1Kh14MQW1SBWO7MQBJNXgZLXmuAa4+J2ftawQcrftqxASdaswCf"
+}

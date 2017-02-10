@@ -1,5 +1,4 @@
 ﻿using ClientHost.Properties;
-using DSS.UareU.Web.Api.Client.Controllers.V1;
 using DSS.UareU.Web.Api.Client.Services;
 using Microsoft.Owin.Hosting;
 using System;
