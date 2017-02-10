@@ -30,13 +30,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.License.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureWebsite", "AzureWebsite\AzureWebsite.csproj", "{E8571BC8-E095-4A10-AFAE-0973C669D788}"
 EndProject
-Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureCloudHostDeployment", "AzureCloudHostDeployment\AzureCloudHostDeployment.ccproj", "{D7C71D90-587E-4C36-B5C4-47DCC7DD75A9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.A2F.Fingerprint.Owin.Role", "DSS.A2F.Fingerprint.Owin.Role\DSS.A2F.Fingerprint.Owin.Role.csproj", "{B3C3508B-4980-4DDA-AE84-627C30BA99CF}"
-EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureCloudService2", "AzureCloudService2\AzureCloudService2.ccproj", "{227CA67B-07C8-45DE-84A2-0AFD009F9D34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerRole2", "WorkerRole2\WorkerRole2.csproj", "{5E15AB6E-7274-4D59-BA05-1BC477D9A43C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.A2F.Fingerprint.Owin.Role", "WorkerRole2\DSS.A2F.Fingerprint.Owin.Role.csproj", "{5E15AB6E-7274-4D59-BA05-1BC477D9A43C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,14 +84,6 @@ Global
 		{E8571BC8-E095-4A10-AFAE-0973C669D788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8571BC8-E095-4A10-AFAE-0973C669D788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8571BC8-E095-4A10-AFAE-0973C669D788}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7C71D90-587E-4C36-B5C4-47DCC7DD75A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7C71D90-587E-4C36-B5C4-47DCC7DD75A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7C71D90-587E-4C36-B5C4-47DCC7DD75A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7C71D90-587E-4C36-B5C4-47DCC7DD75A9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B3C3508B-4980-4DDA-AE84-627C30BA99CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B3C3508B-4980-4DDA-AE84-627C30BA99CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B3C3508B-4980-4DDA-AE84-627C30BA99CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B3C3508B-4980-4DDA-AE84-627C30BA99CF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{227CA67B-07C8-45DE-84A2-0AFD009F9D34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{227CA67B-07C8-45DE-84A2-0AFD009F9D34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{227CA67B-07C8-45DE-84A2-0AFD009F9D34}.Release|Any CPU.ActiveCfg = Release|Any CPU

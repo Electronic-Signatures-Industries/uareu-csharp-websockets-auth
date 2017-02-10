@@ -37,24 +37,23 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WorkerRole2\WorkerRole2.csproj">
-      <Name>WorkerRole2</Name>
-      <Project>{5e15ab6e-7274-4d59-ba05-1bc477d9a43c}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>WorkerRole2</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Profiles" />
-    <Folder Include="WorkerRole2Content\" />
+    <Folder Include="DSS.A2F.Fingerprint.Owin.RoleContent" />
   </ItemGroup>
   <ItemGroup>
-    <DiagnosticsConfiguration Include="WorkerRole2Content\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="DSS.A2F.Fingerprint.Owin.RoleContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <ItemGroup>
     <PublishProfile Include="Profiles\A2FactorFingerprintDemoProduction.azurePubxml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WorkerRole2\DSS.A2F.Fingerprint.Owin.Role.csproj">
+      <Name>DSS.A2F.Fingerprint.Owin.Role</Name>
+      <Project>{5e15ab6e-7274-4d59-ba05-1bc477d9a43c}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>DSS.A2F.Fingerprint.Owin.Role</RoleName>
+    </ProjectReference>
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
