@@ -1,4 +1,5 @@
-﻿using Owin;
+﻿
+using Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace DSS.A2F.Fingerprint.Owin.Role
     {
         public void Configuration(IAppBuilder app)
         {
-           // app.UseNancy();
+            app.UseNancy();
         }
     }
 }

@@ -5,13 +5,13 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>2.9</ProductVersion>
-    <ProjectGuid>d7c71d90-587e-4c36-b5c4-47dcc7dd75a9</ProjectGuid>
+    <ProjectGuid>227ca67b-07c8-45de-84a2-0afd009f9d34</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AzureCloudHostDeployment</RootNamespace>
-    <AssemblyName>AzureCloudHostDeployment</AssemblyName>
+    <RootNamespace>AzureCloudService2</RootNamespace>
+    <AssemblyName>AzureCloudService2</AssemblyName>
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
-    <Name>AzureCloudHostDeployment</Name>
+    <Name>AzureCloudService2</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,25 +37,24 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DSS.A2F.Fingerprint.Owin.RoleContent\" />
-    <Folder Include="Profiles" />
+    <ProjectReference Include="..\WorkerRole2\WorkerRole2.csproj">
+      <Name>WorkerRole2</Name>
+      <Project>{5e15ab6e-7274-4d59-ba05-1bc477d9a43c}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>WorkerRole2</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <DiagnosticsConfiguration Include="DSS.A2F.Fingerprint.Owin.RoleContent\diagnostics.wadcfgx" />
+    <Folder Include="Profiles" />
+    <Folder Include="WorkerRole2Content\" />
+  </ItemGroup>
+  <ItemGroup>
+    <DiagnosticsConfiguration Include="WorkerRole2Content\diagnostics.wadcfgx" />
   </ItemGroup>
   <ItemGroup>
     <PublishProfile Include="Profiles\A2FactorFingerprintDemoProduction.azurePubxml" />
-    <PublishProfile Include="Profiles\A2FactorFingerprintDemoStaging.azurePubxml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DSS.A2F.Fingerprint.Owin.Role\DSS.A2F.Fingerprint.Owin.Role.csproj">
-      <Name>DSS.A2F.Fingerprint.Owin.Role</Name>
-      <Project>{b3c3508b-4980-4dda-ae84-627c30ba99cf}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>DSS.A2F.Fingerprint.Owin.Role</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
