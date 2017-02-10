@@ -25,32 +25,22 @@ namespace DSS.UareU.Web.Api.Service.Services
 
         public void BindLicense()
         {
-            var license = "license.json";
-            if (!File.Exists(license))
-            {
-                Console.WriteLine("Missing license.json");
-                return;
-            }
+            this.License = ApiBootstrap.GetLicense();
 
             try
             {
 
                 var temp = new LicenseModel();
-                using (StreamReader reader = new StreamReader(license))
+                var model = this.License;
+                temp = new LicenseModel
                 {
-                    var text = reader.ReadToEnd();
-                    var model = JsonConvert.DeserializeObject<LicenseModel>(text);
-                    this.License = model;
-                    temp = new LicenseModel
-                    {
-                        AllowedApps = model.AllowedApps,
-                        ApiClientSecret = model.ApiClientSecret,
-                        ApiServerSecret = model.ApiServerSecret,
-                        Created = model.Created,
-                        Entity = model.Entity,
-                        Name = model.Name,
-                    };
-                }
+                    AllowedApps = model.AllowedApps,
+                    ApiClientSecret = model.ApiClientSecret,
+                    ApiServerSecret = model.ApiServerSecret,
+                    Created = model.Created,
+                    Entity = model.Entity,
+                    Name = model.Name,
+                };
                 var unsignedLic = JsonConvert.SerializeObject(temp);
                 LicenseService verifier = new LicenseService();
                 bool isValid = verifier.Verify(Resources.a2f_fp_key_pub, this.License.l, unsignedLic);

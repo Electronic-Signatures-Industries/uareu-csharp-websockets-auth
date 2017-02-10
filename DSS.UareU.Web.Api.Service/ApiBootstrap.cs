@@ -54,26 +54,7 @@ namespace DSS.UareU.Web.Api.Service
 
         public void Initialize(IPipelines pipelines)
         {
-            var license = ConfigurationManager.AppSettings["LicensePath"];
-            license = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, license);
-            if (!File.Exists(license))
-            {
-                throw new Exception("Missing license.json");
-            }
-
-            try
-            {
-                using (StreamReader reader = new StreamReader(license))
-                {
-                    var text = reader.ReadToEnd();
-                    var model = JsonConvert.DeserializeObject<LicenseModel>(text);
-                    this.License = model;
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error while reading license.json");
-            }
+            this.License = GetLicense();
 
             var cs = ConfigurationManager.AppSettings["DbConnectionString"];
             var dbname = ConfigurationManager.AppSettings["DbName"];
@@ -92,6 +73,46 @@ namespace DSS.UareU.Web.Api.Service
             var statelessAuthConfiguration = new StatelessAuthenticationConfiguration(OnBearerAuthentication);
 
             StatelessAuthentication.Enable(pipelines, statelessAuthConfiguration);
+        }
+
+        public static LicenseModel GetLicense()
+        {
+            var license = ConfigurationManager.AppSettings["LicensePath"];
+            var json = string.Empty;
+
+            if (license == null)
+            {
+                json = ConfigurationManager.AppSettings["License"];
+            }
+            else
+            {
+                license = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, license);
+                if (!File.Exists(license))
+                {
+                    throw new Exception("Missing license.json");
+                }
+            }
+
+            try
+            {
+                if (license == null)
+                {
+                    return JsonConvert.DeserializeObject<LicenseModel>(json);
+                }
+                else
+                {
+                    using (StreamReader reader = new StreamReader(license))
+                    {
+                        var text = reader.ReadToEnd();
+                        var model = JsonConvert.DeserializeObject<LicenseModel>(text);
+                        return model;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error while reading license.json");
+            }
         }
 
     }

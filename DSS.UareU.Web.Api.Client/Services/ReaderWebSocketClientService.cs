@@ -15,9 +15,9 @@ namespace DSS.UareU.Web.Api.Client.Services
         ReaderService reader = new ReaderService();
         const int TIMEOUT_SECONDS = 15;
 
-        public ReaderWebSocketClientService()
+        public ReaderWebSocketClientService(string url)
         {
-            client = new WebSocket("ws://localhost:8082/reader");
+            client = new WebSocket(url);
             client.OnMessage += Client_OnMessage;
         }
 

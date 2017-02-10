@@ -22,19 +22,12 @@ namespace ClientHost
             //wssv.AddWebSocketService<PingWebSocketController>("/ping");
             //wssv.Start();
 
-            ReaderWebSocketClientService client = new ReaderWebSocketClientService();
+            string url = "ws://a2factorfingerprintdemo.cloudapp.net:8082/reader";
+            ReaderWebSocketClientService client = new ReaderWebSocketClientService(url);
             client.Start("cliente");
 
-            string webPort = ConfigurationManager.AppSettings["auth2factor.REST.Port"];
-            var url = "http://localhost:" + webPort;
-
-            using (WebApp.Start<Startup>(url))
-            {
-                Console.WriteLine("Running on {0}", url);
-                Console.WriteLine("Press enter to exit");
                 Console.ReadLine();
                 client.Close();
-            }
         }
     }
 }
