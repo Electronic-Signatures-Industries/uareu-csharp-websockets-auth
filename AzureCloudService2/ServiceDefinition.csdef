@@ -8,5 +8,8 @@
       <InputEndpoint name="REST" protocol="http" port="80" />
       <InputEndpoint name="WS" protocol="tcp" port="8082" />
     </Endpoints>
+    <LocalResources>
+      <LocalStorage name="DPUareUInstall" cleanOnRoleRecycle="true" sizeInMB="1024" />
+    </LocalResources>
   </WorkerRole>
 </ServiceDefinition>
