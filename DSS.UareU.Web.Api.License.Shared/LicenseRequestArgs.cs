@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.License.Shared
+namespace DSS.A2F.Fingerprint.License.Shared
 {
     public class LicenseRequestArgs
     {

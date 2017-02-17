@@ -1,5 +1,4 @@
 ﻿using DSS.LicenseEngine;
-using DSS.UareU.Web.Api.LicenseConsole.Properties;
 using Fclp;
 using Newtonsoft.Json;
 using System;
@@ -8,9 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using DSS.UareU.Web.Api.License.Shared;
+using DSS.A2F.Fingerprint.License.Shared;
+using DSS.A2F.Fingerprint.LicenseConsole.Properties;
 
-namespace DSS.UareU.Web.Api.LicenseConsole
+namespace DSS.A2F.Fingerprint.LicenseConsole
 {
     // -n "Demo App" -e auth2factor -a http://localhost:8080/ http://localhost:8088/
     class Program

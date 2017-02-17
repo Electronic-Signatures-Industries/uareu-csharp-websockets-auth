@@ -27,8 +27,9 @@ namespace DSS.UareU.Web.Api.Client.Services
             this.client.Send("REGISTER_DEVICE:" + name);
         }
 
-        public void Close()
+        public void Close(string name)
         {
+            this.client.Send("UNREGISTER_DEVICE:" + name);
             this.client.Close();
         }
 

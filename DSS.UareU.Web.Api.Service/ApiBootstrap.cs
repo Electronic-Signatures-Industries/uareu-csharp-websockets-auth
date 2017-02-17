@@ -1,4 +1,4 @@
-﻿using DSS.UareU.Web.Api.License.Shared;
+﻿using DSS.A2F.Fingerprint.License.Shared;
 using DSS.UareU.Web.Api.Service.Models;
 using DSS.UareU.Web.Api.Shared;
 using MongoDB.Driver;
@@ -9,11 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Service
 {

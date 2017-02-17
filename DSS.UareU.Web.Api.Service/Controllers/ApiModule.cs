@@ -1,16 +1,9 @@
-﻿using DPUruNet;
-using DSS.UareU.Web.Api.License.Shared;
-using DSS.UareU.Web.Api.Service.Models;
-using DSS.UareU.Web.Api.Service.Services;
+﻿using DSS.A2F.Fingerprint.License.Shared;
 using Jose;
-using MongoDB.Driver;
 using Nancy;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Service.Controllers
 {

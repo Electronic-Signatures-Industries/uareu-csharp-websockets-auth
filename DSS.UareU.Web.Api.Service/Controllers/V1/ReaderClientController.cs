@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
 using WebSocketSharp;
@@ -16,7 +17,9 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
     {
         static Dictionary<string, bool> OnPreReponseQueue = new Dictionary<string, bool>();
         static Dictionary<string, string> RequestSubscribers = new Dictionary<string, string>();
-        static Dictionary<string, string> DevicesSubscribers = new Dictionary<string, string>();
+        static MemoryCache DevicesSubscribers = new MemoryCache("device-subscribers");
+        CacheItemPolicy CACHE_POLICY;
+
         WebSocketSecureTokenService AuthService { get; set; }
         CaptureService captureService = new CaptureService();
 
@@ -24,6 +27,11 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
         {
             AuthService = new WebSocketSecureTokenService();
             AuthService.BindLicense();
+
+            CACHE_POLICY = new CacheItemPolicy
+            {
+                SlidingExpiration = TimeSpan.FromHours(1),
+            };
         }
 
         void SendToDevices(ReaderClientRequestMediaType request)
@@ -36,14 +44,14 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
         void SendToDevice(string clientId, ReaderClientRequestMediaType request)
         {
-            if (DevicesSubscribers.Keys.FirstOrDefault(i => i == clientId ) == null)
+            if (DevicesSubscribers.FirstOrDefault(i => i.Key == clientId ).Value == null)
             {
                 request.Data = JsonConvert.SerializeObject(new { Message = "Invalid client id" });
                 this.Send(JsonConvert.SerializeObject(request));
                 return;
             }
 
-            var id = DevicesSubscribers[clientId];
+            var id = (string)DevicesSubscribers[clientId];
             if (this.Sessions.ActiveIDs.Where(i => i == id).Count() > 0)
             {
                 this.Sessions.SendTo(JsonConvert.SerializeObject(request), id);
@@ -75,22 +83,55 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
         }
 
 
+        void DeviceConnectionMiddleware(string data, out bool next)
+        {
+            next = true;
+
+            if (data.IndexOf("REGISTER_DEVICE") > -1)
+            {
+                var id = data.Split(':').ElementAtOrDefault(1);
+
+                if (id == null)
+                {
+                    throw new Exception("Missing register device name");
+                }
+
+                if (DevicesSubscribers.FirstOrDefault(i => i.Key == id).Value == null)
+                {
+                    DevicesSubscribers.Add(id, this.ID, CACHE_POLICY);
+                }
+                next = false;
+            }
+
+            if (data.IndexOf("UNREGISTER_DEVICE") > -1)
+            {
+                var id = data.Split(':').ElementAtOrDefault(1);
+
+                if (id == null)
+                {
+                    throw new Exception("Missing register device name");
+                }
+
+                if (DevicesSubscribers.FirstOrDefault(i => i.Key == id).Value != null)
+                {
+                    DevicesSubscribers.Remove(id);
+                }
+                next = false;
+            }
+        }
+
         protected override void OnMessage(MessageEventArgs e)
         {
 
             if (e.IsText)
             {
-                if (e.Data.IndexOf("REGISTER_DEVICE") > -1)
+                var next = true;
+                DeviceConnectionMiddleware(e.Data, out next);
+                if (!next)
                 {
-                    var id = e.Data.Split(':').ElementAtOrDefault(1);
-
-                    if (id == null)
-                    {
-                        throw new Exception("Missing register device name");
-                    }
-                    DevicesSubscribers.Add(id, this.ID);
                     return;
                 }
+
                 var payload = JsonConvert.DeserializeObject<ReaderClientRequestMediaType>(e.Data);
                 AuthService.BindToken(payload.BearerToken);
 
