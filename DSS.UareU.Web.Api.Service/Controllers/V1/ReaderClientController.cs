@@ -42,9 +42,31 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             }
         }
 
+        void Reply(string stateCheck, ReaderClientRequestMediaType request)
+        {
+            var sid = string.Empty;
+
+            if (RequestSubscribers.FirstOrDefault(i => i.Key == stateCheck).Value != null)
+            {
+                sid = RequestSubscribers[stateCheck];
+            }
+
+            if (sid.Length > 0)
+            {
+                RequestSubscribers.Remove(stateCheck);
+
+                if (this.Sessions.ActiveIDs.Where(i => i == sid).Count() > 0)
+                {
+                    this.Sessions.SendTo(JsonConvert.SerializeObject(request), sid);
+                }
+            }
+        }
+
+
+
         void SendToDevice(string clientId, ReaderClientRequestMediaType request)
         {
-            if (DevicesSubscribers.FirstOrDefault(i => i.Key == clientId ).Value == null)
+            if (DevicesSubscribers.FirstOrDefault(i => i.Key == clientId).Value == null)
             {
                 request.Data = JsonConvert.SerializeObject(new { Message = "Invalid client id" });
                 this.Send(JsonConvert.SerializeObject(request));
@@ -141,12 +163,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                     Data = payload.Data,
                 };
                 bool exit = false;
-                var sid = string.Empty;
 
-                if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value != null)
-                {
-                    sid = RequestSubscribers[payload.StateCheck];
-                }
                 switch (payload.Type)
                 {
                     case "device_subscribers":
@@ -155,7 +172,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
                         this.RequiresAuthentication(payload.Type, request, out exit);
                         if (exit) return;
-                        
+
                         request.Type = payload.Type + "_response";
                         request.Data = JsonConvert.SerializeObject(new { devices = DevicesSubscribers.ToArray() });
                         SendToDevice(this.ID, request);
@@ -167,7 +184,8 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         this.RequiresAuthentication(payload.Type, request, out exit);
                         if (exit) return;
 
-                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null) {
+                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
+                        {
                             RequestSubscribers.Add(payload.StateCheck, this.ID);
                         }
                         request.Type = payload.Type + "_request";
@@ -176,12 +194,8 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         break;
 
                     case "device_info_reply":
-                        if (sid != null)
-                        {
-                            RequestSubscribers.Remove(payload.StateCheck);
-                            request.Type = "device_info_response";
-                            this.Sessions.SendTo(JsonConvert.SerializeObject(request), sid);
-                        }
+                        request.Type = "device_info_response";
+                        Reply(payload.StateCheck, request);
                         break;
 
                     case "capture_image":
@@ -217,24 +231,19 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         break;
 
                     case "capture_image_reply":
-                        if (sid != null)
+                        request.Type = "capture_image_response";
+
+                        if (OnPreReponseQueue.Keys.FirstOrDefault(i => i == payload.StateCheck) != null)
                         {
-                            RequestSubscribers.Remove(payload.StateCheck);
-                            request.Type = "capture_image_response";
+                            OnPreReponseQueue.Remove(payload.StateCheck);
+                            var capture = JsonConvert.DeserializeObject<FingerCaptureClient>(request.Data);
+                            var model = captureService.SaveCapture(capture.FMD, capture.WSQ);
+                            capture.ID = model.Id;
 
-                            if (OnPreReponseQueue.Keys.FirstOrDefault(i => i == payload.StateCheck) != null)
-                            {
-                                OnPreReponseQueue.Remove(payload.StateCheck);
-                                var capture = JsonConvert.DeserializeObject<FingerCaptureClient>(request.Data);
-                                var model = captureService.SaveCapture(capture.FMD, capture.WSQ);
-                                capture.ID = model.Id;
+                            request.Data = JsonConvert.SerializeObject(capture);
 
-                                request.Data = JsonConvert.SerializeObject(capture);
-
-                            }
-
-                            this.Sessions.SendTo(JsonConvert.SerializeObject(request), sid);
                         }
+                        Reply(payload.StateCheck, request);
                         break;
 
 

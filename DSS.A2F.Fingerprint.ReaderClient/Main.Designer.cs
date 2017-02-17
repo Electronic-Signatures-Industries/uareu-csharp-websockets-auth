@@ -31,6 +31,7 @@
             this.idLabel = new System.Windows.Forms.Label();
             this.startButton = new System.Windows.Forms.Button();
             this.stopButton = new System.Windows.Forms.Button();
+            this.copyClipboardButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // idLabel
@@ -65,11 +66,23 @@
             this.stopButton.UseVisualStyleBackColor = false;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
             // 
+            // copyClipboardButton
+            // 
+            this.copyClipboardButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.copyClipboardButton.Image = global::DSS.A2F.Fingerprint.ReaderClient.Properties.Resources.ic_content_copy_black_24dp_1x;
+            this.copyClipboardButton.Location = new System.Drawing.Point(214, 23);
+            this.copyClipboardButton.Name = "copyClipboardButton";
+            this.copyClipboardButton.Size = new System.Drawing.Size(33, 30);
+            this.copyClipboardButton.TabIndex = 3;
+            this.copyClipboardButton.UseVisualStyleBackColor = true;
+            this.copyClipboardButton.Click += new System.EventHandler(this.copyClipboardButton_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.copyClipboardButton);
             this.Controls.Add(this.stopButton);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.idLabel);
@@ -87,6 +100,7 @@
         private System.Windows.Forms.Label idLabel;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button stopButton;
+        private System.Windows.Forms.Button copyClipboardButton;
     }
 }
 

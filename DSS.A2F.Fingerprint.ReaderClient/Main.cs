@@ -52,5 +52,10 @@ namespace DSS.A2F.Fingerprint.ReaderClient
             idLabel.Text = uid.Insert(4, "-");
 
         }
+
+        private void copyClipboardButton_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetDataObject(this.idLabel.Text);
+        }
     }
 }
