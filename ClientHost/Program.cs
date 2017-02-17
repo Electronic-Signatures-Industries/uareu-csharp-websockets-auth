@@ -27,7 +27,7 @@ namespace ClientHost
             client.Start("cliente");
 
                 Console.ReadLine();
-                client.Close();
+                client.Close("cliente");
         }
     }
 }

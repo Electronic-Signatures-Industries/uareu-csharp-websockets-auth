@@ -233,16 +233,27 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                     case "capture_image_reply":
                         request.Type = "capture_image_response";
 
-                        if (OnPreReponseQueue.Keys.FirstOrDefault(i => i == payload.StateCheck) != null)
+                        try
                         {
-                            OnPreReponseQueue.Remove(payload.StateCheck);
-                            var capture = JsonConvert.DeserializeObject<FingerCaptureClient>(request.Data);
-                            var model = captureService.SaveCapture(capture.FMD, capture.WSQ);
-                            capture.ID = model.Id;
+                            if (OnPreReponseQueue.Keys.FirstOrDefault(i => i == payload.StateCheck) != null)
+                            {
+                                OnPreReponseQueue.Remove(payload.StateCheck);
+                                var capture = JsonConvert.DeserializeObject<FingerCaptureClient>(request.Data);
+                                var model = captureService.SaveCapture(capture.FMD, capture.WSQ);
+                                capture.ID = model.Id;
 
-                            request.Data = JsonConvert.SerializeObject(capture);
+                                request.Data = JsonConvert.SerializeObject(capture);
 
+                            }
                         }
+                        catch (Exception ex)
+                        {
+                            request.Data = JsonConvert.SerializeObject(new
+                            {
+                                error = ex.ToString(),
+                            });
+                        }
+
                         Reply(payload.StateCheck, request);
                         break;
 
