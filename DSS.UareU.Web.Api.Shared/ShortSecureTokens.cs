@@ -5,7 +5,7 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Shared
+namespace DSS.A2F.Fingerprint.Api.Shared
 {
     public class ShortSecureTokens
     {

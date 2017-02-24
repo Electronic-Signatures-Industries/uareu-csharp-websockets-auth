@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceHost", "SelfHost\Ser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.Client", "DSS.UareU.Web.Api.Client\DSS.UareU.Web.Api.Client.csproj", "{AEA6B4E5-9E71-4119-8563-1B6BD080CA0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.Shared", "DSS.UareU.Web.Api.Shared\DSS.UareU.Web.Api.Shared.csproj", "{70D36D24-C39E-4F8E-B8B5-301A74E7A58D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.A2F.Fingerprint.Api.Shared", "DSS.UareU.Web.Api.Shared\DSS.A2F.Fingerprint.Api.Shared.csproj", "{70D36D24-C39E-4F8E-B8B5-301A74E7A58D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientHost", "ClientHost\ClientHost.csproj", "{B85F132D-7A80-4714-948D-0A137C8D8AA4}"
 EndProject

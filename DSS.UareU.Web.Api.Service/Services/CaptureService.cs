@@ -1,15 +1,12 @@
 ﻿using DPUruNet;
+using DSS.A2F.Fingerprint.Api.Shared;
+using DSS.A2F.Fingerprint.Api.Shared.Mediatypes;
 using DSS.UareU.Web.Api.Service.Models;
-using DSS.UareU.Web.Api.Shared;
-using DSS.UareU.Web.Api.Shared.Mediatypes;
 using MongoDB.Driver;
 using Nancy.Responses;
-using System;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Service.Services

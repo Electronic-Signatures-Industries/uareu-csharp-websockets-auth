@@ -1,18 +1,13 @@
 ﻿using DPUruNet;
+using DSS.A2F.Fingerprint.Api.Shared;
+using DSS.A2F.Fingerprint.Api.Shared.Mediatypes;
 using DSS.UareU.Web.Api.Client.Models;
-using DSS.UareU.Web.Api.Shared;
-using DSS.UareU.Web.Api.Shared.Mediatypes;
-using Jose;
 using Nancy.Responses;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,24 +32,6 @@ namespace DSS.UareU.Web.Api.Client.Services
             }
         }
 
-        private string GetSecureToken(string username, string id)
-        {
-            var secretKey = ConfigurationManager.AppSettings["TokenSecret"];
-            var payload = new Dictionary<string, object>()
-                {
-                    { "account", id },
-                    { "email", username },
-                    { "exp", DateTime.UtcNow.AddHours(1).ToBinary() }
-                };
-
-
-
-            var s = Jose.JWT.Encode(payload, Encoding.UTF8.GetBytes(secretKey), JwsAlgorithm.HS256);
-            var token = Guid.NewGuid().ToString();
-            ShortSecureTokens.Items.Add(token, s, this.CACHE_POLICY);
-
-            return token;
-        }
 
         private string SaveCapture(CaptureResult capture, Fid.Fiv imageView)
         {

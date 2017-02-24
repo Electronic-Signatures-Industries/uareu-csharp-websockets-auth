@@ -91,9 +91,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DSS.UareU.Web.Api.Shared\DSS.UareU.Web.Api.Shared.csproj">
+    <ProjectReference Include="..\DSS.UareU.Web.Api.Shared\DSS.A2F.Fingerprint.Api.Shared.csproj">
       <Project>{70d36d24-c39e-4f8e-b8b5-301a74e7a58d}</Project>
-      <Name>DSS.UareU.Web.Api.Shared</Name>
+      <Name>DSS.A2F.Fingerprint.Api.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,5 @@
-﻿using DSS.UareU.Web.Api.Shared.Mediatypes;
+﻿using DSS.A2F.Fingerprint.Api.Shared.Mediatypes;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WebSocketSharp;
 

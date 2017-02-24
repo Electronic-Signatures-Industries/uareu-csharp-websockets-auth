@@ -1,6 +1,6 @@
-﻿using DSS.A2F.Fingerprint.License.Shared;
+﻿using DSS.A2F.Fingerprint.Api.Shared;
+using DSS.A2F.Fingerprint.License.Shared;
 using DSS.UareU.Web.Api.Service.Models;
-using DSS.UareU.Web.Api.Shared;
 using MongoDB.Driver;
 using Nancy.Authentication.Stateless;
 using Nancy.Bootstrapper;

@@ -1,7 +1,7 @@
-﻿using DSS.A2F.Fingerprint.License.Shared;
+﻿using DSS.A2F.Fingerprint.Api.Shared;
+using DSS.A2F.Fingerprint.License.Shared;
 using DSS.LicenseEngine;
 using DSS.UareU.Web.Api.Service.Properties;
-using DSS.UareU.Web.Api.Shared;
 using Newtonsoft.Json;
 using System;
 using System.Linq;

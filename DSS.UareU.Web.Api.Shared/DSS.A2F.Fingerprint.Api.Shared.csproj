@@ -7,8 +7,8 @@
     <ProjectGuid>{70D36D24-C39E-4F8E-B8B5-301A74E7A58D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DSS.UareU.Web.Api.Shared</RootNamespace>
-    <AssemblyName>DSS.UareU.Web.Api.Shared</AssemblyName>
+    <RootNamespace>DSS.A2F.Fingerprint.Api.Shared</RootNamespace>
+    <AssemblyName>DSS.A2F.Fingerprint.Api.Shared</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

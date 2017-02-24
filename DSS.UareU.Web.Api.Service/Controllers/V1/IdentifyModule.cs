@@ -1,15 +1,11 @@
-﻿using DSS.UareU.Web.Api.Shared.Mediatypes;
-using DSS.UareU.Web.Api.Service.Services;
+﻿using DSS.UareU.Web.Api.Service.Services;
 using Nancy;
-using Nancy.Json;
 using Nancy.ModelBinding;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nancy.Security;
-
+using DSS.A2F.Fingerprint.Api.Shared.Mediatypes;
 
 namespace DSS.UareU.Web.Api.Service.Controllers.V1
 {

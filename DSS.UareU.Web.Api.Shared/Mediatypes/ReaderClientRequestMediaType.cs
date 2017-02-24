@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DSS.UareU.Web.Api.Shared.Mediatypes
+namespace DSS.A2F.Fingerprint.Api.Shared.Mediatypes
 {
     public class ReaderClientRequestMediaType
     {

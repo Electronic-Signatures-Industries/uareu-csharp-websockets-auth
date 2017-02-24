@@ -1,16 +1,11 @@
-﻿using DSS.UareU.Web.Api.Client.Services;
-using DSS.UareU.Web.Api.Shared;
+﻿using DSS.A2F.Fingerprint.Api.Shared;
 using Nancy.Authentication.Stateless;
 using Nancy.Bootstrapper;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DSS.UareU.Web.Api.Client
 {
@@ -31,16 +26,7 @@ namespace DSS.UareU.Web.Api.Client
             var statelessAuthConfiguration = new StatelessAuthenticationConfiguration(ctx =>
             {
                 var jwtToken = "";
-                if (ctx.Request.Query["s"] ==  null) {
-                    jwtToken = ctx.Request.Headers.Authorization.Replace("Bearer ", "");
-                } else
-                {
-                    var key = ctx.Request.Query["s"];
-                    if (ShortSecureTokens.Items[key] != null)
-                    {
-                        jwtToken = ShortSecureTokens.Items[key];
-                    }
-                }
+                jwtToken = ctx.Request.Headers.Authorization.Replace("Bearer ", "");
 
                 try
                 {
