@@ -2,6 +2,7 @@
 using DSS.UareU.Web.Api.Service.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 {
     public class ReaderClientController : WebSocketBehavior
     {
-        static Dictionary<string, bool> OnPreReponseQueue = new Dictionary<string, bool>();
-        static Dictionary<string, string> RequestSubscribers = new Dictionary<string, string>();
+        private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
+        static MemoryCache OnPreReponseQueue = new MemoryCache("on-pre-response");
+        static MemoryCache RequestSubscribers = new MemoryCache("request-subscribers");
         static MemoryCache DevicesSubscribers = new MemoryCache("device-subscribers");
         CacheItemPolicy CACHE_POLICY;
+        CacheItemPolicy REQ_CACHE_POLICY;
 
         WebSocketSecureTokenService AuthService { get; set; }
         CaptureService captureService = new CaptureService();
@@ -24,16 +27,23 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
         public ReaderClientController()
         {
             AuthService = new WebSocketSecureTokenService();
+            logger.Info("bind license");
             AuthService.BindLicense();
 
             CACHE_POLICY = new CacheItemPolicy
             {
                 SlidingExpiration = TimeSpan.FromHours(1),
             };
+
+            REQ_CACHE_POLICY = new CacheItemPolicy
+            {
+                SlidingExpiration = TimeSpan.FromMinutes(15),
+            };
         }
 
         void SendToDevices(ReaderClientRequestMediaType request)
         {
+            logger.Info("send to devices");
             foreach (var id in this.Sessions.ActiveIDs.Where(i => DevicesSubscribers.FirstOrDefault(j => j.Key == i).Value != null))
             {
                 this.Sessions.SendTo(JsonConvert.SerializeObject(request), id);
@@ -46,7 +56,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
             if (RequestSubscribers.FirstOrDefault(i => i.Key == stateCheck).Value != null)
             {
-                sid = RequestSubscribers[stateCheck];
+                sid = (string)RequestSubscribers[stateCheck];
             }
 
             if (sid.Length > 0)
@@ -55,6 +65,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
                 if (this.Sessions.ActiveIDs.Where(i => i == sid).Count() > 0)
                 {
+                    logger.Info("reply to subscriber if active: sid={0}, state={1}", sid, stateCheck);
                     this.Sessions.SendTo(JsonConvert.SerializeObject(request), sid);
                 }
             }
@@ -74,6 +85,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             var id = (string)DevicesSubscribers[clientId];
             if (this.Sessions.ActiveIDs.Where(i => i == id).Count() > 0)
             {
+                logger.Info("send to  device if active: sid={0}", id);
                 this.Sessions.SendTo(JsonConvert.SerializeObject(request), id);
             }
         }
@@ -102,6 +114,13 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
             }
         }
 
+        void AddSessionToRequestSubscriber(string stateCheck)
+        {
+            if (RequestSubscribers.FirstOrDefault(i => i.Key == stateCheck).Value == null)
+            {
+                RequestSubscribers.Add(stateCheck, this.ID, this.REQ_CACHE_POLICY);
+            }
+        }
 
         void DeviceConnectionMiddleware(string data, out bool next)
         {
@@ -119,6 +138,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                 if (DevicesSubscribers.FirstOrDefault(i => i.Key == id).Value == null)
                 {
                     DevicesSubscribers.Add(id, this.ID, CACHE_POLICY);
+                    logger.Info("device '{0}' registered", id);
                 }
                 next = false;
             }
@@ -135,6 +155,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                 if (DevicesSubscribers.FirstOrDefault(i => i.Key == id).Value != null)
                 {
                     DevicesSubscribers.Remove(id);
+                    logger.Info("device '{0}' unregistered", id);
                 }
                 next = false;
             }
@@ -171,6 +192,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         this.RequiresAuthentication(payload.Type, request, out exit);
                         if (exit) return;
 
+                        logger.Info("listing device subscribers");
                         request.Type = payload.Type + "_response";
                         request.Data = JsonConvert.SerializeObject(new { devices = DevicesSubscribers.ToArray() });
                         SendToDevice(this.ID, request);
@@ -182,10 +204,8 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         this.RequiresAuthentication(payload.Type, request, out exit);
                         if (exit) return;
 
-                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
-                        {
-                            RequestSubscribers.Add(payload.StateCheck, this.ID);
-                        }
+                        logger.Info("requesting device info");
+                        AddSessionToRequestSubscriber(payload.StateCheck);
                         request.Type = payload.Type + "_request";
 
                         SendToDevice(payload.ClientID, request);
@@ -203,10 +223,8 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                         this.RequiresAuthentication(payload.Type, request, out exit);
                         if (exit) return;
 
-                        if (RequestSubscribers.FirstOrDefault(i => i.Key == payload.StateCheck).Value == null)
-                        {
-                            RequestSubscribers.Add(payload.StateCheck, this.ID);
-                        }
+                        logger.Info("requesting capture image");
+                        AddSessionToRequestSubscriber(payload.StateCheck);
                         request.Type = payload.Type + "_request";
 
                         if (payload.Data != null && payload.Data.Length > 0)
@@ -217,7 +235,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                                 bool store = options["store"].Value<bool>();
                                 if (store)
                                 {
-                                    OnPreReponseQueue.Add(payload.StateCheck, true);
+                                    OnPreReponseQueue.Add(payload.StateCheck, true, REQ_CACHE_POLICY);
                                 }
                             }
                             catch
@@ -233,7 +251,7 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
                         try
                         {
-                            if (OnPreReponseQueue.Keys.FirstOrDefault(i => i == payload.StateCheck) != null)
+                            if (OnPreReponseQueue.FirstOrDefault(i => i.Key == payload.StateCheck).Value != null)
                             {
                                 OnPreReponseQueue.Remove(payload.StateCheck);
                                 var capture = JsonConvert.DeserializeObject<FingerCaptureClient>(request.Data);
@@ -241,7 +259,6 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
                                 capture.ID = model.Id;
 
                                 request.Data = JsonConvert.SerializeObject(capture);
-
                             }
                         }
                         catch (Exception ex)
@@ -254,8 +271,6 @@ namespace DSS.UareU.Web.Api.Service.Controllers.V1
 
                         Reply(payload.StateCheck, request);
                         break;
-
-
                 }
             }
         }

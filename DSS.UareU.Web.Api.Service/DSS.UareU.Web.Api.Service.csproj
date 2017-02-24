@@ -121,6 +121,12 @@
     <Compile Include="Services\WebSocketSecureTokenService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Resources\a2f_fp_key_pub" />
   </ItemGroup>
