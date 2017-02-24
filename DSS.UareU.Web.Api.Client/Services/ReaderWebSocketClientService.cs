@@ -1,5 +1,6 @@
 ﻿using DSS.A2F.Fingerprint.Api.Shared.Mediatypes;
 using Newtonsoft.Json;
+using NLog;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
@@ -8,11 +9,13 @@ namespace DSS.UareU.Web.Api.Client.Services
     public class ReaderWebSocketClientService
     {
         private WebSocket client { get; set; }
+        private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
         ReaderService reader = new ReaderService();
         const int TIMEOUT_SECONDS = 15;
 
         public ReaderWebSocketClientService(string url)
         {
+            logger.Info("opening {0}", url);
             client = new WebSocket(url);
             client.OnMessage += Client_OnMessage;
         }
@@ -21,12 +24,14 @@ namespace DSS.UareU.Web.Api.Client.Services
         {
             this.client.Connect();
             this.client.Send("REGISTER_DEVICE:" + name);
+            logger.Info("connecting");
         }
 
         public void Close(string name)
         {
             this.client.Send("UNREGISTER_DEVICE:" + name);
             this.client.Close();
+            logger.Info("closing");
         }
 
         private async void Client_OnMessage(object sender, MessageEventArgs e)
@@ -41,6 +46,7 @@ namespace DSS.UareU.Web.Api.Client.Services
                 switch (payload.Type)
                 {
                     case "device_info_request":
+                        logger.Info("requesting device info");
                         request.Type = "device_info_reply";
 
                         try
@@ -50,17 +56,21 @@ namespace DSS.UareU.Web.Api.Client.Services
                         }
                         catch
                         {
+                            logger.Info("no device found");
                             request.Data = JsonConvert.SerializeObject(new { Message = "No device found" });
                         }
 
-                        this.client.Send(JsonConvert.SerializeObject(request));
+                        if (this.client.IsAlive)
+                        {
+                            this.client.Send(JsonConvert.SerializeObject(request));
+                        }
 
                         break;
 
                     case "capture_image_request":
                         request.Type = "capture_image_reply";
                         var captureTask = reader.CaptureAsync();
-
+                        logger.Info("requesting capture");
                         if (captureTask == await Task.WhenAny(captureTask, Task.Delay(TIMEOUT_SECONDS * 1000)))
                         {
                             await captureTask;
@@ -71,6 +81,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
                             if (this.reader.CurrentCaptureModel == null)
                             {
+                                logger.Info("no reader found");
                                 reader.Close();
                                 request.Data = JsonConvert.SerializeObject(new { Message = "No reader found" });
                             }
@@ -83,17 +94,21 @@ namespace DSS.UareU.Web.Api.Client.Services
                                     WSQ = this.reader.CurrentCaptureModel.WSQImage,
                                     ContentType = "image/jpg",
                                 });
+                                logger.Info("capture done");
                             }
                         }
                         else
                         {
+                            logger.Info("timeout");
                             reader.Close();
                             request.Data = JsonConvert.SerializeObject(new { Message = "Timeout after 15 seconds" });
                         }
 
 
-
-                        this.client.Send(JsonConvert.SerializeObject(request));
+                        if (this.client.IsAlive)
+                        {
+                            this.client.Send(JsonConvert.SerializeObject(request));
+                        }
 
                         break;
 

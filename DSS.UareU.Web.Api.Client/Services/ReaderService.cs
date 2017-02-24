@@ -3,6 +3,7 @@ using DSS.A2F.Fingerprint.Api.Shared;
 using DSS.A2F.Fingerprint.Api.Shared.Mediatypes;
 using DSS.UareU.Web.Api.Client.Models;
 using Nancy.Responses;
+using NLog;
 using System;
 using System.Drawing.Imaging;
 using System.IO;
@@ -15,6 +16,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 {
     public class ReaderService
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         CacheItemPolicy CACHE_POLICY = new CacheItemPolicy
         {
             AbsoluteExpiration = DateTime.Now.AddHours(1)
@@ -28,6 +30,7 @@ namespace DSS.UareU.Web.Api.Client.Services
         {
             if (this._reader != null)
             {
+                logger.Info("closing reader");
                 this._reader.Dispose();
             }
         }
@@ -35,6 +38,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
         private string SaveCapture(CaptureResult capture, Fid.Fiv imageView)
         {
+            logger.Info("saving capture");
             // FMD
             var fmd = CreateFMD(capture);
 
@@ -65,6 +69,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
             var id = Guid.NewGuid().ToString();
             _cache.Add(id, model, CACHE_POLICY);
+            logger.Info("capture saved - {0}", id);
             return id;
 
         }
@@ -74,6 +79,7 @@ namespace DSS.UareU.Web.Api.Client.Services
             DataResult<Fmd> resultConversion = FeatureExtraction.CreateFmdFromFid(capture.Data, Constants.Formats.Fmd.ANSI);
             if (resultConversion.ResultCode != Constants.ResultCode.DP_SUCCESS)
             {
+                logger.Error("unable to convert to FMD");
                 throw new Exception(resultConversion.ResultCode.ToString());
             }
 
@@ -87,6 +93,7 @@ namespace DSS.UareU.Web.Api.Client.Services
 
         public Task GetCaptureImageAsync(string id, FindCaptureOptions options)
         {
+            logger.Info("get capture from cache - {0}", id);
             FingerCapture model = null;
             if (_cache.FirstOrDefault(i => i.Key == id).Value != null)
             {
@@ -95,12 +102,14 @@ namespace DSS.UareU.Web.Api.Client.Services
 
             if (model == null)
             {
+                logger.Info("no capture found");
                 return Task.FromResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No capture found"));
             }
 
             this.CurrentCaptureModel = model;
             MemoryStream stream = new MemoryStream();
 
+            logger.Info("returning capture");
             if (options.Extended)
             {
                 var fmd = Convert.ToBase64String(model.FMD);
@@ -132,7 +141,7 @@ namespace DSS.UareU.Web.Api.Client.Services
                 var opened = _reader.Open(Constants.CapturePriority.DP_PRIORITY_EXCLUSIVE);
                 Thread.Sleep(550);
                 Console.WriteLine("Opened: " + opened.ToString());
-
+                logger.Info("reader opened with result: {0}", opened);
                 if (opened == Constants.ResultCode.DP_SUCCESS)
                 {
                     var flag = _reader.CaptureAsync(Constants.Formats.Fid.ANSI, 
@@ -140,9 +149,11 @@ namespace DSS.UareU.Web.Api.Client.Services
                     Thread.Sleep(1500);
                     _reader.On_Captured += (res) =>
                     {
-                        Console.WriteLine("Captured");
                         var view = res.Data.Views.FirstOrDefault();
-                        if (view != null) {                            
+                        if (view != null) {
+                            Console.WriteLine("Captured");
+                            logger.Info("captured image and saving");
+
                             var id = SaveCapture(res, view);
                             this.CurrentCaptureID = id;
                             // var token = GetSecureToken(username, id);
@@ -152,6 +163,8 @@ namespace DSS.UareU.Web.Api.Client.Services
                             tcs.SetResult(resp);
                         } else
                         {
+                            logger.Info("unable to capture image");
+
                             tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No image captured"));
                         }
 
@@ -162,6 +175,7 @@ namespace DSS.UareU.Web.Api.Client.Services
                 }
                 else
                 {
+                    logger.Warn("reader issues: {0}", opened);
                     tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, opened.ToString()));
                 }
             } else
@@ -170,6 +184,7 @@ namespace DSS.UareU.Web.Api.Client.Services
                 {
                     _reader.Dispose();
                 }
+                logger.Warn("no reader found");
                 tcs.SetResult(ResponseMessageBuilder.BuildMessageResponse(Nancy.HttpStatusCode.BadRequest, "No reader found"));
             }
 
