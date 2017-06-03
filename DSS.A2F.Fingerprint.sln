@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.Service", "DSS.UareU.Web.Api.Service\DSS.UareU.Web.Api.Service.csproj", "{9FF209D7-C82B-42E8-AF53-76AB17EE90E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceHost", "SelfHost\ServiceHost.csproj", "{776640FB-188A-4D02-9E6E-F11BA91EB734}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.A2F.Fingerprint.SelfHost", "SelfHost\DSS.A2F.Fingerprint.SelfHost.csproj", "{776640FB-188A-4D02-9E6E-F11BA91EB734}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSS.UareU.Web.Api.Client", "DSS.UareU.Web.Api.Client\DSS.UareU.Web.Api.Client.csproj", "{AEA6B4E5-9E71-4119-8563-1B6BD080CA0F}"
 EndProject
